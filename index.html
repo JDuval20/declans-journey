@@ -1,0 +1,3254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Declan's Journey — Development Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf6ee;
+    --warm-white: #fffaf4;
+    --sand: #e8d5b7;
+    --tan: #c9aa82;
+    --terracotta: #c4714a;
+    --rust: #a85432;
+    --sage: #7a9e7e;
+    --sage-light: #b5cdb8;
+    --dusty-blue: #8aaebb;
+    --dusty-blue-light: #c2dce3;
+    --mauve: #b38fa0;
+    --text-dark: #3d2c1e;
+    --text-mid: #6b4f38;
+    --text-light: #9a7d65;
+    --shadow: rgba(100, 65, 30, 0.12);
+    --card-bg: rgba(255,250,244,0.92);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 10% 20%, rgba(201,170,130,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(138,174,187,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(179,143,160,0.08) 0%, transparent 70%);
+  }
+
+  /* NAV */
+  nav {
+    background: var(--warm-white);
+    border-bottom: 2px solid var(--sand);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--terracotta);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .nav-logo span { font-style: italic; color: var(--text-light); font-size: 0.95rem; }
+  .nav-tabs {
+    display: flex;
+    gap: 0.25rem;
+  }
+  .nav-tab {
+    padding: 0.45rem 1rem;
+    border: none;
+    background: none;
+    border-radius: 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-tab:hover { background: var(--sand); color: var(--text-dark); }
+  .nav-tab.active { background: var(--terracotta); color: white; }
+
+  /* PAGES */
+  .page { display: none; padding: 2rem; max-width: 1100px; margin: 0 auto; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION HEADER */
+  .section-header {
+    margin-bottom: 1.75rem;
+  }
+  .section-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--text-dark);
+    line-height: 1.2;
+  }
+  .section-header p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+  }
+
+  /* ── DASHBOARD ── */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.5rem;
+  }
+  .profile-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+  }
+  .profile-avatar {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sand), var(--dusty-blue-light));
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 4px solid var(--terracotta);
+    position: relative;
+    cursor: pointer;
+  }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
+  .avatar-placeholder { font-size: 3.5rem; }
+  .avatar-upload-hint {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+  }
+  .profile-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+  }
+  .profile-age {
+    color: var(--terracotta);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  .profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+  .tag {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .tag-speech { background: var(--dusty-blue-light); color: var(--dusty-blue); }
+  .tag-aba { background: #ffe0cc; color: var(--rust); }
+  .tag-music { background: #e4d8f0; color: #7b5ea7; }
+  .tag-nutrition { background: #d8edd9; color: var(--sage); }
+  .tag-dr { background: #fde9e1; color: var(--terracotta); }
+
+  .quick-stats {
+    display: flex;
+    gap: 0.75rem;
+    flex-direction: column;
+  }
+  .stat-pill {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--sand);
+  }
+  .stat-pill .label { font-size: 0.8rem; color: var(--text-light); }
+  .stat-pill .value { font-weight: 700; font-size: 1rem; color: var(--terracotta); }
+
+  .dashboard-right { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .recent-entries {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .entry-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .entry-item {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--terracotta);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .entry-item.mood-great { border-left-color: var(--sage); }
+  .entry-item.mood-okay { border-left-color: var(--dusty-blue); }
+  .entry-item.mood-hard { border-left-color: var(--mauve); }
+  .entry-text { font-size: 0.88rem; color: var(--text-mid); }
+  .entry-meta { font-size: 0.78rem; color: var(--text-light); text-align: right; }
+
+  .milestone-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  .milestone-mini {
+    background: var(--cream);
+    border-radius: 14px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--sand);
+  }
+  .milestone-mini .emoji { font-size: 1.6rem; margin-bottom: 0.3rem; }
+  .milestone-mini .cat { font-size: 0.75rem; color: var(--text-light); font-weight: 600; }
+  .milestone-mini .pct { font-size: 1.1rem; font-weight: 700; color: var(--terracotta); }
+  .mini-bar { height: 5px; background: var(--sand); border-radius: 10px; margin-top: 0.4rem; overflow: hidden; }
+  .mini-bar-fill { height: 100%; background: linear-gradient(90deg, var(--terracotta), var(--tan)); border-radius: 10px; transition: width 0.6s ease; }
+
+  /* ── MILESTONES ── */
+  .milestones-layout { display: flex; flex-direction: column; gap: 2rem; }
+  .milestone-category {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+  }
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .cat-icon { font-size: 1.6rem; }
+  .cat-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--text-dark); }
+  .cat-progress-wrap { flex: 1; }
+  .cat-progress-bar { height: 8px; background: var(--sand); border-radius: 10px; overflow: hidden; margin-top: 4px; }
+  .cat-progress-fill { height: 100%; border-radius: 10px; transition: width 0.8s ease; }
+  .fill-speech { background: linear-gradient(90deg, var(--dusty-blue), var(--dusty-blue-light)); }
+  .fill-social { background: linear-gradient(90deg, var(--terracotta), #e8a07a); }
+  .fill-motor { background: linear-gradient(90deg, var(--sage), var(--sage-light)); }
+  .fill-daily { background: linear-gradient(90deg, var(--mauve), #d4afc4); }
+  .cat-pct { font-weight: 700; color: var(--terracotta); font-size: 0.9rem; min-width: 36px; text-align: right; }
+
+  .milestones-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .milestone-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0.5rem;
+    border-radius: 10px;
+    transition: background 0.15s;
+  }
+  .milestone-item:hover { background: rgba(232,213,183,0.25); }
+  .milestone-checkbox {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--tan);
+    background: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .milestone-checkbox.checked {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+  .milestone-info { flex: 1; }
+  .milestone-label { font-size: 0.9rem; color: var(--text-dark); font-weight: 500; }
+  .milestone-label.done { text-decoration: line-through; color: var(--text-light); }
+  .milestone-date { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 2rem; margin-top: 0.5rem; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 9px; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--terracotta), var(--sand));
+    border-radius: 2px;
+  }
+  .timeline-event {
+    position: relative;
+    margin-bottom: 1.25rem;
+    animation: fadeIn 0.4s ease;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -1.85rem;
+    top: 4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--terracotta);
+    border: 2px solid var(--cream);
+    box-shadow: 0 0 0 2px var(--terracotta);
+  }
+  .timeline-dot.pending { background: var(--sand); box-shadow: 0 0 0 2px var(--tan); }
+  .timeline-content {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid var(--sand);
+  }
+  .timeline-title { font-size: 0.88rem; font-weight: 600; color: var(--text-dark); }
+  .timeline-sub { font-size: 0.75rem; color: var(--text-light); }
+
+  /* ── DOCUMENTS ── */
+  .docs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+  .doc-folder {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .doc-folder:hover { transform: translateY(-3px); box-shadow: 0 8px 28px var(--shadow); }
+  .folder-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .folder-icon { font-size: 2rem; }
+  .folder-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--text-dark); }
+  .folder-count { font-size: 0.78rem; color: var(--text-light); }
+
+  .doc-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; min-height: 60px; }
+  .doc-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    border: 1px solid var(--sand);
+  }
+  .doc-item .doc-icon { font-size: 1rem; }
+  .doc-item .doc-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-item .doc-date { font-size: 0.72rem; color: var(--text-light); }
+  .doc-empty { font-size: 0.82rem; color: var(--text-light); text-align: center; padding: 0.75rem 0; font-style: italic; }
+
+  .upload-btn {
+    width: 100%;
+    padding: 0.6rem;
+    background: none;
+    border: 2px dashed var(--tan);
+    border-radius: 10px;
+    color: var(--text-light);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  }
+  .upload-btn:hover { border-color: var(--terracotta); color: var(--terracotta); background: rgba(196,113,74,0.05); }
+
+  /* ── JOURNAL ── */
+  .journal-layout { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start; }
+  .journal-form {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+  }
+  .form-label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-mid);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .form-group { margin-bottom: 1.25rem; }
+
+  .mood-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .mood-btn {
+    padding: 0.45rem 1rem;
+    border-radius: 20px;
+    border: 2px solid var(--sand);
+    background: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-mid);
+    display: flex; align-items: center; gap: 0.3rem;
+  }
+  .mood-btn:hover { border-color: var(--terracotta); }
+  .mood-btn.selected-great { background: #d8edd9; border-color: var(--sage); color: var(--sage); }
+  .mood-btn.selected-good { background: var(--dusty-blue-light); border-color: var(--dusty-blue); color: var(--dusty-blue); }
+  .mood-btn.selected-okay { background: #fdf3e3; border-color: var(--tan); color: var(--tan); }
+  .mood-btn.selected-hard { background: #f5e8f0; border-color: var(--mauve); color: var(--mauve); }
+  .mood-btn.selected-tough { background: #fde9e1; border-color: var(--terracotta); color: var(--terracotta); }
+
+  textarea {
+    width: 100%;
+    border: 1.5px solid var(--sand);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    resize: vertical;
+    min-height: 130px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--terracotta); }
+
+  .photo-drop {
+    border: 2px dashed var(--tan);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    background: var(--cream);
+  }
+  .photo-drop:hover { border-color: var(--terracotta); color: var(--terracotta); background: rgba(196,113,74,0.04); }
+  .photo-drop .drop-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+  .photo-preview { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+  .photo-thumb {
+    width: 70px; height: 70px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--sand);
+    position: relative;
+  }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: linear-gradient(135deg, var(--terracotta), var(--rust));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(168,84,50,0.3);
+    letter-spacing: 0.02em;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168,84,50,0.4); }
+  .submit-btn:active { transform: translateY(0); }
+
+  .journal-history {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+  }
+  .journal-entries { display: flex; flex-direction: column; gap: 1rem; max-height: 600px; overflow-y: auto; padding-right: 4px; }
+  .journal-entries::-webkit-scrollbar { width: 5px; }
+  .journal-entries::-webkit-scrollbar-track { background: var(--sand); border-radius: 10px; }
+  .journal-entries::-webkit-scrollbar-thumb { background: var(--tan); border-radius: 10px; }
+
+  .journal-entry-card {
+    background: var(--cream);
+    border-radius: 14px;
+    padding: 1rem;
+    border: 1px solid var(--sand);
+    animation: fadeIn 0.3s ease;
+  }
+  .entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+  .entry-mood-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .badge-great { background: #d8edd9; color: var(--sage); }
+  .badge-good { background: var(--dusty-blue-light); color: var(--dusty-blue); }
+  .badge-okay { background: #fdf3e3; color: var(--tan); }
+  .badge-hard { background: #f5e8f0; color: var(--mauve); }
+  .badge-tough { background: #fde9e1; color: var(--terracotta); }
+  .entry-date-text { font-size: 0.75rem; color: var(--text-light); }
+  .entry-body { font-size: 0.85rem; color: var(--text-mid); line-height: 1.5; }
+  .entry-photos { display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap; }
+  .entry-photo-thumb {
+    width: 54px; height: 54px;
+    border-radius: 8px; overflow: hidden;
+    border: 1.5px solid var(--sand);
+  }
+  .entry-photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .no-entries { text-align: center; color: var(--text-light); font-size: 0.88rem; font-style: italic; padding: 2rem 0; }
+
+  /* ── MONTHLY HIGHLIGHTS ── */
+  .highlights-layout { display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start; }
+  .highlights-form {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+  }
+  .month-selector { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .month-selector select, .month-year-input {
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid var(--sand);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+    display: block;
+  }
+  .month-selector select:focus, .month-year-input:focus { border-color: var(--terracotta); }
+  .month-year-input { width: 90px; border: 1.5px solid var(--sand); border-radius: 10px; padding: 0.5rem 0.75rem; font-family: 'Nunito',sans-serif; font-size: 0.9rem; color: var(--text-dark); background: var(--cream); outline: none; }
+  .week-tabs { display: flex; gap: 0.4rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .week-tab {
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    border: 2px solid var(--sand);
+    background: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .week-tab:hover { border-color: var(--terracotta); color: var(--terracotta); }
+  .week-tab.active { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+  .highlight-category-select { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .hcat-btn {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    border: 2px solid var(--sand);
+    background: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: all 0.2s;
+  }
+  .hcat-btn:hover { border-color: var(--tan); }
+  .hcat-btn.hcat-active { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+  .highlight-input {
+    width: 100%;
+    border: 1.5px solid var(--sand);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 0.75rem;
+    resize: vertical;
+    min-height: 80px;
+  }
+  .highlight-input:focus { border-color: var(--terracotta); }
+  .add-highlight-btn {
+    padding: 0.6rem 1.4rem;
+    background: linear-gradient(135deg, var(--terracotta), var(--rust));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 10px rgba(168,84,50,0.25);
+  }
+  .add-highlight-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(168,84,50,0.35); }
+  .month-view-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+    max-height: 700px;
+    overflow-y: auto;
+  }
+  .month-view-card::-webkit-scrollbar { width: 5px; }
+  .month-view-card::-webkit-scrollbar-track { background: var(--sand); border-radius: 10px; }
+  .month-view-card::-webkit-scrollbar-thumb { background: var(--tan); border-radius: 10px; }
+  .week-section { margin-bottom: 1.5rem; }
+  .week-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1.5px solid var(--sand);
+  }
+  .highlight-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.55rem 0.5rem;
+    border-radius: 10px;
+    transition: background 0.15s;
+    animation: fadeIn 0.3s ease;
+  }
+  .highlight-entry:hover { background: rgba(232,213,183,0.25); }
+  .highlight-bullet { width: 8px; height: 8px; border-radius: 50%; background: var(--tan); flex-shrink: 0; margin-top: 6px; }
+  .highlight-bullet.cat-speech { background: var(--dusty-blue); }
+  .highlight-bullet.cat-social { background: var(--terracotta); }
+  .highlight-bullet.cat-motor { background: var(--sage); }
+  .highlight-bullet.cat-daily { background: var(--mauve); }
+  .highlight-text { font-size: 0.88rem; color: var(--text-mid); line-height: 1.45; flex: 1; }
+  .highlight-cat-tag { font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 10px; flex-shrink: 0; }
+  .htag-speech { background: var(--dusty-blue-light); color: var(--dusty-blue); }
+  .htag-social { background: #fde9e1; color: var(--terracotta); }
+  .htag-motor { background: #d8edd9; color: var(--sage); }
+  .htag-daily { background: #f5e8f0; color: var(--mauve); }
+  .htag-general { background: var(--sand); color: var(--text-mid); }
+  .delete-highlight { background: none; border: none; cursor: pointer; color: var(--text-light); font-size: 0.85rem; padding: 0 0.2rem; opacity: 0; transition: opacity 0.15s; }
+  .highlight-entry:hover .delete-highlight { opacity: 1; }
+  .no-highlights { font-size: 0.85rem; color: var(--text-light); font-style: italic; text-align: center; padding: 1.5rem 0; }
+  @media (max-width: 768px) { .highlights-layout { grid-template-columns: 1fr; } }
+
+  /* INPUT hidden */
+  input[type="file"] { display: none; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text-dark);
+    color: white;
+    padding: 0.7rem 1.4rem;
+    border-radius: 30px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    z-index: 9999;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 768px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .journal-layout { grid-template-columns: 1fr; }
+    .milestone-summary { grid-template-columns: repeat(2, 1fr); }
+    nav { padding: 0 1rem; }
+    .nav-tab { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+  }
+
+  /* ── FOLDER MODAL ── */
+  #folderModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(61,44,30,0.45);
+    z-index: 9000;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+  }
+  #folderModal.open { display: flex; animation: fadeIn 0.25s ease; }
+  .folder-modal-card {
+    background: var(--warm-white);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 700px;
+    box-shadow: 0 16px 48px rgba(61,44,30,0.18);
+    border: 1.5px solid rgba(232,213,183,0.7);
+    overflow: hidden;
+  }
+  .folder-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1.75rem;
+    border-bottom: 1.5px solid var(--sand);
+    background: var(--cream);
+    position: sticky;
+    top: 0;
+  }
+  .folder-modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--text-dark); flex: 1; }
+  .folder-modal-close {
+    background: none; border: none; font-size: 1.3rem;
+    cursor: pointer; color: var(--text-light); padding: 0.25rem;
+    transition: color 0.2s;
+  }
+  .folder-modal-close:hover { color: var(--terracotta); }
+  .folder-modal-body { padding: 1.5rem 1.75rem; }
+  .folder-search {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 1.5px solid var(--sand);
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    margin-bottom: 1.25rem;
+    transition: border-color 0.2s;
+  }
+  .folder-search:focus { border-color: var(--terracotta); }
+  .folder-month-group { margin-bottom: 1.25rem; }
+  .folder-month-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--sand);
+  }
+  .folder-file-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.5rem;
+    border-radius: 10px;
+    transition: background 0.15s;
+  }
+  .folder-file-row:hover { background: rgba(232,213,183,0.3); }
+  .folder-file-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .folder-file-info { flex: 1; min-width: 0; }
+  .folder-file-name { font-size: 0.88rem; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .folder-file-meta { font-size: 0.75rem; color: var(--text-light); margin-top: 1px; }
+  .folder-file-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+  .folder-btn-download {
+    padding: 0.3rem 0.7rem; border-radius: 8px;
+    background: var(--dusty-blue-light); border: none;
+    color: var(--dusty-blue); font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; font-family: 'Nunito', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .folder-btn-download:hover { opacity: 0.8; }
+  .folder-btn-delete {
+    padding: 0.3rem 0.7rem; border-radius: 8px;
+    background: #fde9e1; border: none;
+    color: var(--terracotta); font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; font-family: 'Nunito', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .folder-btn-delete:hover { opacity: 0.8; }
+  .folder-empty { text-align: center; color: var(--text-light); font-style: italic; font-size: 0.88rem; padding: 2rem 0; }
+  .folder-upload-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.75rem;
+    border-top: 1.5px solid var(--sand);
+    background: var(--cream);
+  }
+  .folder-file-count { font-size: 0.82rem; color: var(--text-light); font-weight: 600; }
+
+  /* Compact folder cards on docs page */
+  .doc-folder-compact {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .doc-folder-compact:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--shadow); }
+  .doc-folder-compact .folder-icon { font-size: 2.2rem; flex-shrink: 0; }
+  .doc-folder-compact .folder-info { flex: 1; }
+  .doc-folder-compact .folder-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--text-dark); }
+  .doc-folder-compact .folder-count { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
+  .open-folder-btn {
+    padding: 0.45rem 1rem;
+    background: linear-gradient(135deg, var(--terracotta), var(--rust));
+    color: white; border: none; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(168,84,50,0.25);
+  }
+  .open-folder-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(168,84,50,0.35); }
+
+  /* ── RESEARCH ── */
+  .research-layout { display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start; }
+  .research-form {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+    position: sticky;
+    top: 80px;
+  }
+  .source-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-bottom: 0.25rem; }
+  .source-type-btn {
+    padding: 0.45rem 0.5rem;
+    border-radius: 10px;
+    border: 2px solid var(--sand);
+    background: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .source-type-btn:hover { border-color: var(--tan); }
+  .source-type-btn.stype-active { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+  .star-rating { display: flex; gap: 0.3rem; margin-bottom: 0.25rem; }
+  .star-btn {
+    background: none; border: none; font-size: 1.4rem;
+    cursor: pointer; transition: transform 0.15s;
+    color: var(--sand);
+    padding: 0;
+  }
+  .star-btn:hover { transform: scale(1.2); }
+  .star-btn.lit { color: #f5a623; }
+  .research-input {
+    width: 100%;
+    border: 1.5px solid var(--sand);
+    border-radius: 12px;
+    padding: 0.65rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 0.75rem;
+  }
+  .research-input:focus { border-color: var(--terracotta); }
+  .research-textarea {
+    width: 100%;
+    border: 1.5px solid var(--sand);
+    border-radius: 12px;
+    padding: 0.65rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+    min-height: 100px;
+    margin-bottom: 0.75rem;
+  }
+  .research-textarea:focus { border-color: var(--terracotta); }
+
+  /* Filter bar */
+  .research-filter-bar {
+    display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center;
+  }
+  .filter-chip {
+    padding: 0.3rem 0.85rem;
+    border-radius: 20px;
+    border: 2px solid var(--sand);
+    background: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: all 0.2s;
+  }
+  .filter-chip:hover { border-color: var(--terracotta); }
+  .filter-chip.factive { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+  .research-search {
+    flex: 1;
+    min-width: 160px;
+    padding: 0.4rem 0.85rem;
+    border: 1.5px solid var(--sand);
+    border-radius: 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .research-search:focus { border-color: var(--terracotta); }
+
+  /* Research cards */
+  .research-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .research-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 16px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+  }
+  .research-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px var(--shadow); }
+  .research-card-header { display: flex; align-items: flex-start; gap: 0.6rem; }
+  .source-badge {
+    padding: 0.22rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .badge-website { background: var(--dusty-blue-light); color: var(--dusty-blue); }
+  .badge-book { background: #e4d8f0; color: #7b5ea7; }
+  .badge-doctor { background: #d8edd9; color: var(--sage); }
+  .badge-video { background: #fde9e1; color: var(--terracotta); }
+  .badge-study { background: #fff3cc; color: #b8860b; }
+  .research-card-title { font-family: 'Playfair Display', serif; font-size: 0.98rem; color: var(--text-dark); line-height: 1.3; flex: 1; }
+  .research-card-author { font-size: 0.78rem; color: var(--text-light); }
+  .research-card-summary { font-size: 0.84rem; color: var(--text-mid); line-height: 1.5; flex: 1; }
+  .research-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem; }
+  .research-card-date { font-size: 0.72rem; color: var(--text-light); }
+  .research-card-stars { font-size: 0.9rem; letter-spacing: 1px; }
+  .research-card-link { font-size: 0.75rem; color: var(--dusty-blue); text-decoration: none; word-break: break-all; }
+  .research-card-link:hover { text-decoration: underline; }
+  .research-card-delete {
+    position: absolute; top: 0.75rem; right: 0.75rem;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-light); font-size: 0.8rem;
+    opacity: 0; transition: opacity 0.15s;
+    padding: 0.2rem;
+  }
+  .research-card:hover .research-card-delete { opacity: 1; }
+  .research-empty { text-align: center; color: var(--text-light); font-style: italic; padding: 3rem 0; font-size: 0.9rem; grid-column: 1/-1; }
+  @media (max-width: 768px) { .research-layout { grid-template-columns: 1fr; } .research-form { position: static; } }
+
+  /* ── THERAPY GOALS ── */
+  .tgoals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 1.5rem; }
+  .tgoal-category {
+    background: var(--card-bg);
+    border-radius: 22px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1.5px solid rgba(232,213,183,0.6);
+  }
+  .tgoal-cat-header {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid var(--sand);
+  }
+  .tgoal-cat-icon { font-size: 1.8rem; }
+  .tgoal-cat-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--text-dark); flex: 1; }
+  .tgoal-progress-wrap { text-align: right; }
+  .tgoal-pct { font-size: 1.1rem; font-weight: 700; color: var(--terracotta); }
+  .tgoal-fraction { font-size: 0.75rem; color: var(--text-light); }
+  .tgoal-bar { height: 6px; background: var(--sand); border-radius: 10px; overflow: hidden; margin-top: 4px; width: 80px; }
+  .tgoal-bar-fill { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+
+  .tgoal-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; min-height: 40px; }
+  .tgoal-item {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.65rem 0.5rem;
+    border-radius: 12px;
+    transition: background 0.15s;
+    border: 1.5px solid transparent;
+  }
+  .tgoal-item:hover { background: rgba(232,213,183,0.25); }
+  .tgoal-item.completed { background: rgba(122,158,126,0.08); border-color: rgba(122,158,126,0.2); }
+  .tgoal-checkbox {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--tan);
+    background: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+  }
+  .tgoal-checkbox.checked { background: var(--sage); border-color: var(--sage); color: white; }
+  .tgoal-info { flex: 1; }
+  .tgoal-label { font-size: 0.9rem; color: var(--text-dark); font-weight: 500; line-height: 1.4; }
+  .tgoal-label.done { text-decoration: line-through; color: var(--text-light); }
+  .tgoal-date { font-size: 0.72rem; color: var(--sage); margin-top: 2px; font-weight: 600; }
+  .tgoal-note { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; font-style: italic; }
+  .tgoal-delete {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-light); font-size: 0.8rem;
+    opacity: 0; transition: opacity 0.15s; padding: 0 0.2rem;
+    flex-shrink: 0;
+  }
+  .tgoal-item:hover .tgoal-delete { opacity: 1; }
+
+  .tgoal-add-area { border-top: 1.5px dashed var(--sand); padding-top: 1rem; }
+  .tgoal-add-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .tgoal-add-input {
+    flex: 1;
+    padding: 0.55rem 0.85rem;
+    border: 1.5px solid var(--sand);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .tgoal-add-input:focus { border-color: var(--terracotta); }
+  .tgoal-add-btn {
+    padding: 0.55rem 1rem;
+    background: linear-gradient(135deg, var(--terracotta), var(--rust));
+    color: white; border: none; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .tgoal-add-btn:hover { opacity: 0.88; }
+  .tgoal-empty { font-size: 0.84rem; color: var(--text-light); font-style: italic; text-align: center; padding: 0.75rem 0; }
+  @media (max-width: 768px) { .tgoals-grid { grid-template-columns: 1fr; } }
+
+  /* ── PASSWORD SCREEN ── */
+  #lockScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--cream);
+    background-image:
+      radial-gradient(ellipse at 15% 25%, rgba(201,170,130,0.22) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 75%, rgba(138,174,187,0.18) 0%, transparent 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    transition: opacity 0.4s ease;
+  }
+  #lockScreen.hidden { opacity: 0; pointer-events: none; }
+  .lock-card {
+    background: var(--warm-white);
+    border-radius: 28px;
+    padding: 2.75rem 2.25rem;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 12px 40px rgba(100,65,30,0.14);
+    border: 1.5px solid rgba(232,213,183,0.7);
+    text-align: center;
+  }
+  .lock-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+  .lock-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    color: var(--text-dark);
+    margin-bottom: 0.3rem;
+  }
+  .lock-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    margin-bottom: 1.75rem;
+  }
+  .lock-input-wrap { position: relative; margin-bottom: 1rem; }
+  .lock-input {
+    width: 100%;
+    padding: 0.85rem 3rem 0.85rem 1.1rem;
+    border: 2px solid var(--sand);
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+  .lock-input:focus { border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(196,113,74,0.12); }
+  .lock-input.error { border-color: #d94f4f; box-shadow: 0 0 0 3px rgba(217,79,79,0.12); animation: shake 0.35s ease; }
+  .lock-toggle {
+    position: absolute;
+    right: 0.9rem; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    cursor: pointer; font-size: 1.1rem;
+    color: var(--text-light);
+    padding: 0;
+  }
+  .lock-btn {
+    width: 100%;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, var(--terracotta), var(--rust));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(168,84,50,0.3);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.75rem;
+  }
+  .lock-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(168,84,50,0.4); }
+  .lock-btn:active { transform: translateY(0); }
+  .lock-error {
+    font-size: 0.82rem;
+    color: #d94f4f;
+    font-weight: 600;
+    min-height: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  .lock-hint {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+  }
+  .change-pw-link {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    cursor: pointer;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    margin-top: 0.75rem;
+    display: inline-block;
+  }
+  .change-pw-link:hover { color: var(--terracotta); }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+
+  /* App blur when locked */
+  #appContent { transition: filter 0.3s; }
+  #appContent.blurred { filter: blur(8px); pointer-events: none; user-select: none; }
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <span class="lock-icon">🍀</span>
+    <div class="lock-title">Declan's Journey</div>
+    <div class="lock-subtitle">This site is private. Please sign in to continue.</div>
+    <div class="lock-input-wrap" style="margin-bottom:0.75rem;">
+      <input class="lock-input" type="email" id="lockEmail" placeholder="Email address" onkeydown="if(event.key==='Enter') document.getElementById('lockInput').focus()" style="letter-spacing:normal;">
+    </div>
+    <div class="lock-input-wrap">
+      <input class="lock-input" type="password" id="lockInput" placeholder="Password" onkeydown="if(event.key==='Enter') unlockApp()">
+      <button class="lock-toggle" onclick="toggleLockVisibility()" id="lockToggleBtn" title="Show/hide password">👁️</button>
+    </div>
+    <div class="lock-error" id="lockError"></div>
+    <button class="lock-btn" id="unlockBtn" onclick="unlockApp()">Sign In</button>
+    <div class="lock-hint" id="lockHint"></div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div id="changePwModal" style="display:none;position:fixed;inset:0;background:rgba(61,44,30,0.45);z-index:999999;align-items:center;justify-content:center;">
+  <div class="lock-card" style="max-width:360px;">
+    <div class="lock-title" style="font-size:1.3rem;margin-bottom:0.25rem;">Change Password</div>
+    <div class="lock-subtitle">Set a new password for your account.</div>
+    <div class="lock-input-wrap" style="margin-bottom:0.75rem;">
+      <input class="lock-input" type="password" id="newPw1" placeholder="New password">
+    </div>
+    <div class="lock-input-wrap" style="margin-bottom:0.75rem;">
+      <input class="lock-input" type="password" id="newPw2" placeholder="Confirm new password">
+    </div>
+    <div class="lock-error" id="changePwError"></div>
+    <button class="lock-btn" onclick="saveNewPassword()">Save New Password</button>
+    <button class="change-pw-link" onclick="closeChangePassword()">Cancel</button>
+  </div>
+</div>
+
+<!-- APP CONTENT -->
+<div id="appContent" class="blurred">
+
+<nav>
+  <div class="nav-logo">🍀 <span>Declan's Journey</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('dashboard')">🏠 Dashboard</button>
+    <button class="nav-tab" onclick="showPage('therapygoals')">🎯 Goals</button>
+    <button class="nav-tab" onclick="showPage('documents')">📂 Documents</button>
+    <button class="nav-tab" onclick="showPage('journal')">📖 Journal</button>
+    <button class="nav-tab" onclick="showPage('highlights')">✨ Highlights</button>
+    <button class="nav-tab" onclick="showPage('research')">🔬 Research</button>
+  </div>
+  <span id="loggedInEmail" style="font-size:0.72rem;color:var(--text-light);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+  <button onclick="lockApp()" style="background:none;border:1.5px solid var(--sand);border-radius:20px;padding:0.3rem 0.85rem;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;color:var(--text-light);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--terracotta)';this.style.color='var(--terracotta)'" onmouseout="this.style.borderColor='var(--sand)';this.style.color='var(--text-light)'">🔒 Sign Out</button>
+  <button onclick="showChangePassword()" style="background:none;border:none;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:600;color:var(--text-light);cursor:pointer;padding:0.3rem 0.5rem;transition:color 0.2s;" onmouseover="this.style.color='var(--terracotta)'" onmouseout="this.style.color='var(--text-light)'">⚙ Password</button>
+  <span id="syncStatus" style="font-size:0.75rem;font-weight:600;min-width:80px;text-align:right;"></span>
+</nav>
+
+<!-- HIDDEN FILE INPUTS -->
+<input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this)">
+<input type="file" id="journalPhotoInput" accept="image/*" multiple onchange="handleJournalPhotos(this)">
+<input type="file" id="docUploadInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.eml,.msg,.csv,.xlsx,.xls" multiple onchange="handleDocUpload(this)">
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="section-header">
+    <h1>Welcome back</h1>
+    <p>Here's a snapshot of your son's beautiful progress.</p>
+  </div>
+  <div class="dashboard-grid">
+    <div class="profile-card">
+      <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()" title="Click to upload photo">
+        <span class="avatar-placeholder" id="avatarEmoji">👦</span>
+        <img id="avatarImg" src="" alt="Profile photo">
+      </div>
+      <div class="avatar-upload-hint">Click photo to update</div>
+      <div class="profile-name" id="profileName">Declan Duval</div>
+      <div class="profile-age" id="profileAge">Calculating age...</div>
+      <div class="quick-stats">
+        <div class="stat-pill"><span class="label">Journal Entries</span><span class="value" id="statEntries">0</span></div>
+        <div class="stat-pill"><span class="label">Documents</span><span class="value" id="statDocs">0</span></div>
+        <div class="stat-pill"><span class="label">Goals Completed</span><span class="value" id="statMilestones">0</span></div>
+      </div>
+    </div>
+
+    <div class="dashboard-right">
+      <div class="recent-entries card">
+        <div class="card-title">📖 Recent Journal Entries</div>
+        <div class="entry-list" id="dashboardEntries">
+          <div class="doc-empty">No entries yet — start your first journal entry!</div>
+        </div>
+      </div>
+
+      <div class="card" id="dailyTipCard">
+        <div class="card-title" style="justify-content:space-between;">
+          <span>💡 Daily Tip for Declan</span>
+          <button onclick="loadDailyTip(true)" style="background:none;border:1.5px solid var(--sand);border-radius:20px;padding:0.2rem 0.75rem;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:700;color:var(--text-light);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--terracotta)';this.style.color='var(--terracotta)'" onmouseout="this.style.borderColor='var(--sand)';this.style.color='var(--text-light)'">↻ New tip</button>
+        </div>
+        <div id="dailyTipContent" style="font-size:0.9rem;color:var(--text-mid);line-height:1.6;margin-top:0.5rem;min-height:60px;">
+          <div style="color:var(--text-light);font-style:italic;font-size:0.85rem;">Loading today's tip...</div>
+        </div>
+        <div id="dailyTipDate" style="font-size:0.72rem;color:var(--text-light);margin-top:0.75rem;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THERAPY GOALS -->
+<div id="page-therapygoals" class="page">
+  <div class="section-header">
+    <h1>Therapy Goals</h1>
+    <p>Track goals set by Declan's therapy team and your family across every area.</p>
+  </div>
+  <div id="therapyGoalsLayout"></div>
+</div>
+
+<!-- DOCUMENTS -->
+<div id="page-documents" class="page">
+  <div class="section-header">
+    <h1>Documents & Records</h1>
+    <p>Keep all of your son's important files organized and in one place.</p>
+  </div>
+  <div class="docs-grid" id="docsGrid"></div>
+</div>
+
+<!-- JOURNAL -->
+<div id="page-journal" class="page">
+  <div class="section-header">
+    <h1>Daily Journal</h1>
+    <p>A space to capture the moments, big wins, and quiet observations.</p>
+  </div>
+  <div class="journal-layout">
+    <div class="journal-form">
+      <div class="card-title" style="margin-bottom:1.25rem">✍️ New Entry</div>
+
+      <div class="form-group">
+        <label class="form-label">How was today?</label>
+        <div class="mood-selector">
+          <button class="mood-btn" data-mood="great" onclick="selectMood(this)">🌟 Great</button>
+          <button class="mood-btn" data-mood="good" onclick="selectMood(this)">😊 Good</button>
+          <button class="mood-btn" data-mood="okay" onclick="selectMood(this)">😐 Okay</button>
+          <button class="mood-btn" data-mood="hard" onclick="selectMood(this)">😔 Hard</button>
+          <button class="mood-btn" data-mood="tough" onclick="selectMood(this)">😢 Tough</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">What did you observe today?</label>
+        <textarea id="journalText" placeholder="Write about what you noticed — new words, reactions, moments of connection, behaviors, wins, struggles... everything counts."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Add Photos</label>
+        <div class="photo-drop" onclick="document.getElementById('journalPhotoInput').click()">
+          <div class="drop-icon">📷</div>
+          <div>Click to add photos from today</div>
+        </div>
+        <div class="photo-preview" id="journalPhotoPreview"></div>
+      </div>
+
+      <button class="submit-btn" onclick="saveJournalEntry()">Save Today's Entry</button>
+    </div>
+
+    <div class="journal-history">
+      <div class="card-title" style="margin-bottom:1rem">🗓️ Past Entries</div>
+      <div class="journal-entries" id="journalEntriesList">
+        <div class="no-entries">Your journal entries will appear here after you save your first one.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MONTHLY HIGHLIGHTS -->
+<div id="page-highlights" class="page">
+  <div class="section-header">
+    <h1>Monthly Highlights</h1>
+    <p>Capture Declan's significant moments week by week, month by month.</p>
+  </div>
+  <div class="highlights-layout">
+    <div class="highlights-form">
+      <div class="card-title" style="margin-bottom:1.25rem">✨ Add a Highlight</div>
+
+      <div class="form-group">
+        <label class="form-label">Month & Year</label>
+        <div class="month-selector">
+          <select id="hlMonth" onchange="renderMonthView()">
+            <option value="0">January</option><option value="1">February</option>
+            <option value="2">March</option><option value="3">April</option>
+            <option value="4">May</option><option value="5">June</option>
+            <option value="6">July</option><option value="7">August</option>
+            <option value="8">September</option><option value="9">October</option>
+            <option value="10">November</option><option value="11">December</option>
+          </select>
+          <input type="number" class="month-year-input" id="hlYear" min="2020" max="2040" value="2026" onchange="renderMonthView()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Week</label>
+        <div class="week-tabs" id="hlWeekTabs">
+          <button class="week-tab active" data-week="1" onclick="selectWeek(this)">Week 1</button>
+          <button class="week-tab" data-week="2" onclick="selectWeek(this)">Week 2</button>
+          <button class="week-tab" data-week="3" onclick="selectWeek(this)">Week 3</button>
+          <button class="week-tab" data-week="4" onclick="selectWeek(this)">Week 4</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <div class="highlight-category-select" id="hlCatBtns">
+          <button class="hcat-btn hcat-active" data-cat="general" onclick="selectHCat(this)">General</button>
+          <button class="hcat-btn" data-cat="speech" onclick="selectHCat(this)">Speech</button>
+          <button class="hcat-btn" data-cat="social" onclick="selectHCat(this)">Social</button>
+          <button class="hcat-btn" data-cat="motor" onclick="selectHCat(this)">Motor</button>
+          <button class="hcat-btn" data-cat="daily" onclick="selectHCat(this)">Daily Living</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Moment / Observation</label>
+        <textarea class="highlight-input" id="hlText" placeholder="e.g. Said 'more please' unprompted at breakfast, Waved bye-bye to his therapist, Danced to his favorite song for the first time..."></textarea>
+      </div>
+
+      <button class="add-highlight-btn" onclick="addHighlight()">+ Add to This Month</button>
+    </div>
+
+    <div class="month-view-card">
+      <div class="card-title" style="margin-bottom:1rem" id="monthViewTitle">This Month's Highlights</div>
+      <div id="hlMonthView">
+        <div class="no-highlights">No highlights yet for this month. Add your first one!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESEARCH -->
+<div id="page-research" class="page">
+  <div class="section-header">
+    <h1>Research Library</h1>
+    <p>Save and organize everything you learn about Declan's journey.</p>
+  </div>
+  <div class="research-layout">
+
+    <!-- ADD FORM -->
+    <div class="research-form">
+      <div class="card-title" style="margin-bottom:1.25rem">🔬 Add Research</div>
+
+      <div class="form-group">
+        <label class="form-label">Source Type</label>
+        <div class="source-type-grid" id="sourceTypeBtns">
+          <button class="source-type-btn" data-type="website" onclick="selectSourceType(this)">🌐 Website</button>
+          <button class="source-type-btn" data-type="book" onclick="selectSourceType(this)">📚 Book</button>
+          <button class="source-type-btn" data-type="doctor" onclick="selectSourceType(this)">🩺 Doctor / Therapist</button>
+          <button class="source-type-btn" data-type="video" onclick="selectSourceType(this)">🎥 Video / Podcast</button>
+          <button class="source-type-btn" data-type="study" onclick="selectSourceType(this)" style="grid-column:1/-1;">🔬 Research Study</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" class="research-input" id="researchTitle" placeholder="Title of article, book, video...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Author / Source Name</label>
+        <input type="text" class="research-input" id="researchAuthor" placeholder="Author, website name, doctor's name...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Link / URL <span style="font-weight:400;color:var(--text-light)">(optional)</span></label>
+        <input type="text" class="research-input" id="researchUrl" placeholder="https://...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Your Summary & Notes</label>
+        <textarea class="research-textarea" id="researchSummary" placeholder="What did you learn? How does it apply to Declan? Key takeaways..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">How Helpful Was This?</label>
+        <div class="star-rating" id="researchStars">
+          <button class="star-btn" data-star="1" onclick="selectStar(1)">★</button>
+          <button class="star-btn" data-star="2" onclick="selectStar(2)">★</button>
+          <button class="star-btn" data-star="3" onclick="selectStar(3)">★</button>
+          <button class="star-btn" data-star="4" onclick="selectStar(4)">★</button>
+          <button class="star-btn" data-star="5" onclick="selectStar(5)">★</button>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="saveResearch()">Save to Library</button>
+    </div>
+
+    <!-- LIBRARY VIEW -->
+    <div>
+      <div class="research-filter-bar">
+        <button class="filter-chip factive" data-filter="all" onclick="selectResearchFilter(this)">All</button>
+        <button class="filter-chip" data-filter="website" onclick="selectResearchFilter(this)">🌐 Website</button>
+        <button class="filter-chip" data-filter="book" onclick="selectResearchFilter(this)">📚 Book</button>
+        <button class="filter-chip" data-filter="doctor" onclick="selectResearchFilter(this)">🩺 Doctor</button>
+        <button class="filter-chip" data-filter="video" onclick="selectResearchFilter(this)">🎥 Video</button>
+        <button class="filter-chip" data-filter="study" onclick="selectResearchFilter(this)">🔬 Study</button>
+        <input type="text" class="research-search" id="researchSearchInput" placeholder="Search..." oninput="renderResearch()">
+      </div>
+      <div class="research-grid" id="researchGrid">
+        <div class="research-empty">Your research library is empty — add your first entry!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOLDER MODAL -->
+<div id="folderModal">
+  <div class="folder-modal-card">
+    <div class="folder-modal-header">
+      <span id="folderModalIcon" style="font-size:1.6rem;"></span>
+      <div class="folder-modal-title" id="folderModalTitle">Folder</div>
+      <button class="folder-modal-close" onclick="closeFolderModal()">✕</button>
+    </div>
+    <div class="folder-modal-body">
+      <input type="text" class="folder-search" id="folderSearch" placeholder="Search documents..." oninput="renderFolderModal()">
+      <div id="folderModalContent"></div>
+    </div>
+    <div class="folder-upload-bar">
+      <span class="folder-file-count" id="folderFileCount">0 files</span>
+      <button class="open-folder-btn" onclick="triggerDocUpload(currentOpenFolder)">➕ Upload Document</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<!-- Firebase SDK (compat version - no module scope issues) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+// ── FIREBASE CONFIG ──
+const firebaseConfig = {
+  apiKey: "AIzaSyCYDyJrM7zetovbCXj4S2hbgLd_zb7KeMo",
+  authDomain: "declan-s-journey.firebaseapp.com",
+  projectId: "declan-s-journey",
+  storageBucket: "declan-s-journey.firebasestorage.app",
+  messagingSenderId: "674004694544",
+  appId: "1:674004694544:web:da00d1bca479ea78c93c95"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// Assign to window so they are accessible from any script block
+window.db = firebase.firestore();
+window.auth = firebase.auth();
+window.DOC_REF = window.db.collection('declansjourney').doc('maindata');
+</script>
+
+<script>
+
+// ── STATE ──
+const state = {
+  journals: [],
+  docs: { speech: [], doctors: [], nutrition: [], aba: [], music: [] },
+  currentDocFolder: null,
+  selectedMood: null,
+  journalPhotos: [],
+  highlights: {},
+  hlSelectedWeek: 1,
+  hlSelectedCat: 'general',
+  milestones: { speech: {}, social: {}, motor: {}, daily: {} },
+  customMilestones: { speech: [], social: [], motor: [], daily: [] },
+  deletedMilestones: { speech: [], social: [], motor: [], daily: [] },
+  research: [],
+  researchSelectedType: null,
+  researchSelectedStars: 0,
+  researchFilterType: 'all',
+  therapyGoals: {
+    aba:     [],
+    speech:  [],
+    music:   [],
+    parents: [],
+  },
+};
+
+// ── STORAGE HELPERS ──
+const STORAGE_KEY = 'dj_appstate';
+
+function buildSaveObject() {
+  return {
+    journals: state.journals,
+    docs: state.docs,
+    highlights: state.highlights,
+    milestones: state.milestones,
+    customMilestones: state.customMilestones,
+    deletedMilestones: state.deletedMilestones,
+    research: state.research,
+    therapyGoals: state.therapyGoals,
+    ageYears: document.getElementById('ageYears') ? document.getElementById('ageYears').value : 3,
+    ageMonths: document.getElementById('ageMonths') ? document.getElementById('ageMonths').value : 4,
+    avatarSrc: document.getElementById('avatarImg') ? document.getElementById('avatarImg').src : '',
+  };
+}
+
+function applyLoadedState(saved) {
+  if (saved.journals) state.journals = saved.journals;
+  if (saved.docs) state.docs = { speech: [], doctors: [], nutrition: [], aba: [], music: [], ...saved.docs };
+  if (saved.highlights) state.highlights = saved.highlights;
+  if (saved.milestones) state.milestones = saved.milestones;
+  if (saved.customMilestones) state.customMilestones = saved.customMilestones;
+  if (saved.deletedMilestones) state.deletedMilestones = saved.deletedMilestones;
+  if (saved.research) state.research = saved.research;
+  if (saved.therapyGoals) state.therapyGoals = { aba:[], speech:[], music:[], parents:[], ...saved.therapyGoals };
+  if (saved.ageYears && document.getElementById('ageYears')) document.getElementById('ageYears').value = saved.ageYears;
+  if (saved.ageMonths && document.getElementById('ageMonths')) document.getElementById('ageMonths').value = saved.ageMonths;
+  if (saved.avatarSrc && saved.avatarSrc.startsWith('data:')) {
+    const img = document.getElementById('avatarImg');
+    if (img) { img.src = saved.avatarSrc; img.style.display = 'block'; }
+    const emoji = document.getElementById('avatarEmoji');
+    if (emoji) emoji.style.display = 'none';
+  }
+  // Re-render everything so saved state is reflected in UI
+  renderJournalEntries();
+  updateDashboard();
+  updateMiniStats();
+  // If milestones page is currently open, re-render it too
+  if (document.getElementById('page-milestones') && document.getElementById('page-milestones').classList.contains('active')) {
+    renderMilestones();
+  }
+}
+
+function saveState() {
+  // Always save to localStorage immediately as a backup
+  try {
+    const obj = buildSaveObject();
+    const json = JSON.stringify(obj);
+    if (json.length > 800000) {
+      showToast('⚠ Storage getting full — consider removing old journal photos');
+    }
+    localStorage.setItem(STORAGE_KEY, json);
+  } catch(e) {}
+  // Debounce Firebase save — waits 1.5s after last change
+  clearTimeout(window._syncTimeout);
+  window._syncTimeout = setTimeout(() => {
+    if (typeof saveToFirebase === 'function') saveToFirebase();
+  }, 1500);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+const catMeta = {
+  speech: { name: 'Speech & Language', icon: '🗣️', fillClass: 'fill-speech' },
+  social: { name: 'Social & Emotional', icon: '🤝', fillClass: 'fill-social' },
+  motor: { name: 'Motor Skills', icon: '🏃', fillClass: 'fill-motor' },
+  daily: { name: 'Daily Living', icon: '🌟', fillClass: 'fill-daily' },
+};
+
+const folderMeta = {
+  speech:    { name: 'Speech Therapy', icon: '🗣️', color: 'var(--dusty-blue)' },
+  doctors:   { name: 'Doctors / Medical', icon: '🩺', color: 'var(--terracotta)' },
+  nutrition: { name: 'Nutrition', icon: '🥦', color: 'var(--sage)' },
+  aba:       { name: 'ABA Therapy', icon: '🧩', color: 'var(--rust)' },
+  music:     { name: 'Music Therapy', icon: '🎵', color: '#7b5ea7' },
+};
+
+const moodLabels = { great: '🌟 Great', good: '😊 Good', okay: '😐 Okay', hard: '😔 Hard', tough: '😢 Tough' };
+
+// ── NAVIGATION ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'therapygoals') renderTherapyGoals();
+  if (id === 'documents') renderDocuments();
+  if (id === 'dashboard') updateDashboard();
+  if (id === 'highlights') initHighlightsPage();
+  if (id === 'research') renderResearch();
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── PHOTO COMPRESSION ──
+function compressImage(file, maxWidth, maxHeight, quality, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      // Scale down to fit within maxWidth/maxHeight
+      if (w > maxWidth || h > maxHeight) {
+        const ratio = Math.min(maxWidth / w, maxHeight / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── AVATAR ──
+function handleAvatarUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  // Compress to max 300x300 at 70% quality — small enough for Firestore
+  compressImage(file, 300, 300, 0.7, (compressed) => {
+    const img = document.getElementById('avatarImg');
+    img.src = compressed;
+    img.style.display = 'block';
+    document.getElementById('avatarEmoji').style.display = 'none';
+    saveState();
+    showToast('Photo updated.');
+  });
+}
+
+// ── AGE-TIERED MILESTONE DATABASE ──
+const milestoneTiers = [
+  {
+    label: 'Age 2y 6m – 3y',
+    minMonths: 30, maxMonths: 35,
+    speech: [
+      { id: 't1s1', label: 'Uses 50+ words' },
+      { id: 't1s2', label: 'Combines 2 words regularly (e.g. "more milk")' },
+      { id: 't1s3', label: 'Names familiar people and objects' },
+      { id: 't1s4', label: 'Follows simple 2-step directions' },
+    ],
+    social: [
+      { id: 't1so1', label: 'Plays near other children (parallel play)' },
+      { id: 't1so2', label: 'Shows affection to familiar people' },
+      { id: 't1so3', label: 'Responds to own name consistently' },
+      { id: 't1so4', label: 'Makes eye contact during interaction' },
+    ],
+    motor: [
+      { id: 't1m1', label: 'Runs without falling often' },
+      { id: 't1m2', label: 'Kicks a ball forward' },
+      { id: 't1m3', label: 'Turns pages of a book' },
+      { id: 't1m4', label: 'Stacks 4+ blocks' },
+    ],
+    daily: [
+      { id: 't1d1', label: 'Uses a spoon with some spilling' },
+      { id: 't1d2', label: 'Removes shoes or socks' },
+      { id: 't1d3', label: 'Washes hands with help' },
+      { id: 't1d4', label: 'Indicates need for toilet (some of the time)' },
+    ],
+  },
+  {
+    label: 'Age 3y 0m – 3y 3m',
+    minMonths: 36, maxMonths: 38,
+    speech: [
+      { id: 't2s1', label: 'Uses 3-word sentences regularly' },
+      { id: 't2s2', label: 'Asks simple questions ("Where daddy?")' },
+      { id: 't2s3', label: 'Understands "mine" and "yours"' },
+      { id: 't2s4', label: 'Points to pictures in books when named' },
+      { id: 't2s5', label: 'Strangers can understand most speech' },
+    ],
+    social: [
+      { id: 't2so1', label: 'Takes turns in simple games' },
+      { id: 't2so2', label: 'Shows interest in other children' },
+      { id: 't2so3', label: 'Expresses emotions with words or gestures' },
+      { id: 't2so4', label: 'Seeks comfort from familiar adults' },
+    ],
+    motor: [
+      { id: 't2m1', label: 'Runs with coordination' },
+      { id: 't2m2', label: 'Climbs jungle gym or stairs' },
+      { id: 't2m3', label: 'Holds crayon or marker' },
+      { id: 't2m4', label: 'Stacks 6+ blocks' },
+      { id: 't2m5', label: 'Turns doorknobs and lids' },
+    ],
+    daily: [
+      { id: 't2d1', label: 'Feeds self with spoon and fork' },
+      { id: 't2d2', label: 'Washes and dries hands independently' },
+      { id: 't2d3', label: 'Helps with simple household tasks' },
+      { id: 't2d4', label: 'Expresses needs without frequent meltdown' },
+    ],
+  },
+  {
+    label: 'Age 3y 3m – 3y 9m',
+    minMonths: 39, maxMonths: 44,
+    speech: [
+      { id: 't3s1', label: 'Uses 3–4 word sentences consistently' },
+      { id: 't3s2', label: 'Answers "what," "where," "who" questions' },
+      { id: 't3s3', label: 'Tells simple stories or describes events' },
+      { id: 't3s4', label: 'Uses plurals (dogs, balls)' },
+      { id: 't3s5', label: 'Uses pronouns (he, she, they)' },
+    ],
+    social: [
+      { id: 't3so1', label: 'Engages in simple pretend play with others' },
+      { id: 't3so2', label: 'Shares toys with prompting' },
+      { id: 't3so3', label: 'Shows empathy (comforts others)' },
+      { id: 't3so4', label: 'Adjusts behavior based on social cues' },
+    ],
+    motor: [
+      { id: 't3m1', label: 'Pedals a tricycle or bike' },
+      { id: 't3m2', label: 'Hops on one foot briefly' },
+      { id: 't3m3', label: 'Draws a circle shape' },
+      { id: 't3m4', label: 'Uses scissors with help' },
+      { id: 't3m5', label: 'Builds towers of 8+ blocks' },
+    ],
+    daily: [
+      { id: 't3d1', label: 'Toilet trained most of the time' },
+      { id: 't3d2', label: 'Puts on and removes simple clothing' },
+      { id: 't3d3', label: 'Brushes teeth with help' },
+      { id: 't3d4', label: 'Sits at table for full meal' },
+    ],
+  },
+  {
+    label: 'Age 3y 9m – 4y 6m',
+    minMonths: 45, maxMonths: 53,
+    speech: [
+      { id: 't4s1', label: 'Speaks in 4–5 word sentences' },
+      { id: 't4s2', label: 'Uses past tense verbs (ran, ate)' },
+      { id: 't4s3', label: 'Tells a story with a beginning and end' },
+      { id: 't4s4', label: 'Answers "why" questions' },
+      { id: 't4s5', label: 'Recites simple songs or rhymes' },
+    ],
+    social: [
+      { id: 't4so1', label: 'Initiates play with peers' },
+      { id: 't4so2', label: 'Cooperates in group play' },
+      { id: 't4so3', label: 'Understands basic rules and takes turns' },
+      { id: 't4so4', label: 'Expresses feelings with words' },
+    ],
+    motor: [
+      { id: 't4m1', label: 'Catches a bounced ball' },
+      { id: 't4m2', label: 'Balances on one foot for 5 seconds' },
+      { id: 't4m3', label: 'Draws a person with 2–4 body parts' },
+      { id: 't4m4', label: 'Cuts along a line with scissors' },
+      { id: 't4m5', label: 'Buttons large buttons' },
+    ],
+    daily: [
+      { id: 't4d1', label: 'Fully toilet independent (daytime)' },
+      { id: 't4d2', label: 'Dresses and undresses with little help' },
+      { id: 't4d3', label: 'Brushes teeth with supervision' },
+      { id: 't4d4', label: 'Pours liquid with little spilling' },
+    ],
+  },
+  {
+    label: 'Age 4y 6m – 5y+',
+    minMonths: 54, maxMonths: 999,
+    speech: [
+      { id: 't5s1', label: 'Speaks clearly in full sentences' },
+      { id: 't5s2', label: 'Uses conjunctions (and, but, because)' },
+      { id: 't5s3', label: 'Tells detailed stories' },
+      { id: 't5s4', label: 'Understands concepts like first, last, before, after' },
+    ],
+    social: [
+      { id: 't5so1', label: 'Has preferred friends' },
+      { id: 't5so2', label: 'Negotiates and problem-solves with peers' },
+      { id: 't5so3', label: 'Understands and follows group rules' },
+      { id: 't5so4', label: 'Recognizes others\' feelings' },
+    ],
+    motor: [
+      { id: 't5m1', label: 'Skips and hops with coordination' },
+      { id: 't5m2', label: 'Writes some letters' },
+      { id: 't5m3', label: 'Draws recognizable pictures' },
+      { id: 't5m4', label: 'Uses fork and knife together' },
+    ],
+    daily: [
+      { id: 't5d1', label: 'Fully independent with toileting' },
+      { id: 't5d2', label: 'Dresses independently' },
+      { id: 't5d3', label: 'Brushes teeth independently' },
+      { id: 't5d4', label: 'Helps set the table' },
+    ],
+  },
+];
+
+function getAgeTier(years, months) {
+  const total = (years * 12) + months;
+  return milestoneTiers.find(t => total >= t.minMonths && total <= t.maxMonths) || milestoneTiers[milestoneTiers.length - 1];
+}
+
+function getActiveTierItems(cat) {
+  const years = parseInt(document.getElementById('ageYears').value) || 3;
+  const months = parseInt(document.getElementById('ageMonths').value) || 4;
+  const tier = getAgeTier(years, months);
+  const deleted = state.deletedMilestones[cat] || [];
+  return (tier[cat] || [])
+    .filter(item => !deleted.includes(item.id))
+    .map(item => {
+      const saved = (state.milestones[cat] || {})[item.id];
+      return { ...item, done: saved ? saved.done : false, date: saved ? saved.date : null };
+    });
+}
+
+function updateAgeAndMilestones() {
+  const years = parseInt(document.getElementById('ageYears').value) || 3;
+  const months = parseInt(document.getElementById('ageMonths').value) || 4;
+  const tier = getAgeTier(years, months);
+  const label = document.getElementById('ageTierLabel');
+  if (label) label.textContent = tier.label;
+  renderMilestones();
+  updateDashboard();
+  saveState();
+}
+
+// ── MILESTONES ──
+function renderMilestones() {
+  const layout = document.getElementById('milestonesLayout');
+  if (!layout) return;
+  layout.innerHTML = '';
+
+  const cats = ['speech', 'social', 'motor', 'daily'];
+  cats.forEach(cat => {
+    const items = getActiveTierItems(cat);
+    const custom = state.customMilestones[cat] || [];
+    const allItems = [...items, ...custom];
+    const done = allItems.filter(i => i.done).length;
+    const total = allItems.length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    const meta = catMeta[cat];
+
+    const deleted = state.deletedMilestones[cat] || [];
+    const div = document.createElement('div');
+    div.className = 'milestone-category';
+    div.innerHTML = `
+      <div class="cat-header">
+        <span class="cat-icon">${meta.icon}</span>
+        <div style="flex:1">
+          <div class="cat-name">${meta.name}</div>
+          <div class="cat-progress-wrap">
+            <div style="font-size:0.75rem;color:var(--text-light)">${done} of ${total} reached</div>
+            <div class="cat-progress-bar"><div class="cat-progress-fill ${meta.fillClass}" style="width:${pct}%"></div></div>
+          </div>
+        </div>
+        <span class="cat-pct">${pct}%</span>
+      </div>
+      ${deleted.length > 0 ? `<div style="margin-bottom:0.75rem;"><button onclick="restoreAllMilestones('${cat}')" style="background:none;border:none;font-size:0.75rem;color:var(--dusty-blue);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:600;padding:0;">↩ Restore ${deleted.length} removed goal${deleted.length > 1 ? 's' : ''}</button></div>` : ''}
+      <div class="milestones-list" id="list-${cat}"></div>
+      ${custom.length > 0 ? `<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1.5px dashed var(--sand)"><div style="font-size:0.78rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.5rem;">Custom Goals</div><div class="milestones-list" id="custom-list-${cat}"></div></div>` : ''}
+      <div style="margin-top:1rem;">
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input type="text" class="highlight-input" id="custom-input-${cat}" placeholder="Add a custom goal from therapist..." style="margin:0;min-height:auto;height:38px;padding:0.4rem 0.85rem;font-size:0.85rem;flex:1;">
+          <button onclick="addCustomMilestone('${cat}')" style="padding:0.4rem 0.9rem;background:var(--sage);color:white;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">+ Add Goal</button>
+        </div>
+      </div>
+      <div style="margin-top:1.25rem">
+        <div class="card-title" style="font-size:1rem;margin-bottom:0.75rem">🕐 Timeline</div>
+        <div class="timeline" id="timeline-${cat}"></div>
+      </div>
+    `;
+    layout.appendChild(div);
+
+    // Render tier milestones
+    const list = document.getElementById('list-' + cat);
+    items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'milestone-item';
+      row.innerHTML = `
+        <div class="milestone-checkbox ${item.done ? 'checked' : ''}" onclick="toggleMilestone('${cat}','${item.id}',false)">
+          ${item.done ? '✓' : ''}
+        </div>
+        <div class="milestone-info" style="flex:1">
+          <div class="milestone-label ${item.done ? 'done' : ''}">${item.label}</div>
+          ${item.date ? `<div class="milestone-date">Achieved: ${item.date}</div>` : ''}
+        </div>
+        <button onclick="hideTierMilestone('${cat}','${item.id}')" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.8rem;opacity:0;padding:0 0.3rem;transition:opacity 0.15s;" title="Remove" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">✕</button>
+      `;
+      list.appendChild(row);
+    });
+
+    // Render custom milestones
+    if (custom.length > 0) {
+      const cList = document.getElementById('custom-list-' + cat);
+      custom.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'milestone-item';
+        row.innerHTML = `
+          <div class="milestone-checkbox ${item.done ? 'checked' : ''}" onclick="toggleMilestone('${cat}','${item.id}',true)">
+            ${item.done ? '✓' : ''}
+          </div>
+          <div class="milestone-info" style="flex:1">
+            <div class="milestone-label ${item.done ? 'done' : ''}">${item.label}</div>
+            ${item.date ? `<div class="milestone-date">Achieved: ${item.date}</div>` : ''}
+          </div>
+          <button onclick="removeCustomMilestone('${cat}','${item.id}')" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.8rem;opacity:0.5;padding:0 0.3rem;" title="Remove">✕</button>
+        `;
+        cList.appendChild(row);
+      });
+    }
+
+    // Timeline
+    const timeline = document.getElementById('timeline-' + cat);
+    const achieved = [...items, ...custom].filter(i => i.done);
+    const pending = [...items, ...custom].filter(i => !i.done);
+    if (achieved.length === 0 && pending.length === 0) {
+      timeline.innerHTML = '<div style="font-size:0.82rem;color:var(--text-light);font-style:italic">No milestones yet.</div>';
+    } else {
+      achieved.forEach(item => {
+        const e = document.createElement('div');
+        e.className = 'timeline-event';
+        e.innerHTML = `<div class="timeline-dot"></div><div class="timeline-content"><div class="timeline-title">✅ ${item.label}</div><div class="timeline-sub">${item.date}</div></div>`;
+        timeline.appendChild(e);
+      });
+      if (pending.length > 0) {
+        const next = pending[0];
+        const e = document.createElement('div');
+        e.className = 'timeline-event';
+        e.innerHTML = `<div class="timeline-dot pending"></div><div class="timeline-content"><div class="timeline-title" style="color:var(--text-light)">⏳ Up next: ${next.label}</div><div class="timeline-sub">Not yet reached</div></div>`;
+        timeline.appendChild(e);
+      }
+    }
+  });
+  updateMiniStats();
+}
+
+function toggleMilestone(cat, id, isCustom) {
+  const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (isCustom) {
+    const item = state.customMilestones[cat].find(i => i.id === id);
+    if (!item) return;
+    item.done = !item.done;
+    item.date = item.done ? today : null;
+    showToast(item.done ? `🌟 "${item.label}" achieved!` : 'Goal unchecked');
+  } else {
+    if (!state.milestones[cat]) state.milestones[cat] = {};
+    const existing = state.milestones[cat][id];
+    const isDone = existing ? !existing.done : true;
+    state.milestones[cat][id] = { done: isDone, date: isDone ? today : null };
+    // get label for toast
+    const years = parseInt(document.getElementById('ageYears').value) || 3;
+    const months = parseInt(document.getElementById('ageMonths').value) || 4;
+    const tier = getAgeTier(years, months);
+    const item = (tier[cat] || []).find(i => i.id === id);
+    showToast(isDone ? `🌟 "${item ? item.label : 'Milestone'}" achieved!` : 'Milestone unchecked');
+  }
+  renderMilestones();
+  updateDashboard();
+  saveState();
+}
+
+function addCustomMilestone(cat) {
+  const input = document.getElementById('custom-input-' + cat);
+  const text = input.value.trim();
+  if (!text) { showToast('Please enter a goal first.'); return; }
+  state.customMilestones[cat].push({ id: 'c_' + Date.now(), label: text, done: false, date: null });
+  input.value = '';
+  renderMilestones();
+  saveState();
+  showToast('Custom goal added!');
+}
+
+function hideTierMilestone(cat, id) {
+  if (!state.deletedMilestones[cat]) state.deletedMilestones[cat] = [];
+  state.deletedMilestones[cat].push(id);
+  // Also clear any saved completion state for it
+  if (state.milestones[cat] && state.milestones[cat][id]) {
+    delete state.milestones[cat][id];
+  }
+  renderMilestones();
+  updateDashboard();
+  saveState();
+  showToast('Goal removed. You can restore it anytime.');
+}
+
+function restoreAllMilestones(cat) {
+  state.deletedMilestones[cat] = [];
+  renderMilestones();
+  saveState();
+  showToast('All goals restored!');
+}
+
+function hideTierMilestone(cat, id) {
+  if (!state.deletedMilestones[cat]) state.deletedMilestones[cat] = [];
+  if (!state.deletedMilestones[cat].includes(id)) {
+    state.deletedMilestones[cat].push(id);
+  }
+  // Also clear any saved completion state for this milestone
+  if (state.milestones[cat] && state.milestones[cat][id]) {
+    delete state.milestones[cat][id];
+  }
+  renderMilestones();
+  updateDashboard();
+  saveState();
+  showToast('Goal removed.');
+}
+
+function updateMiniStats() {
+  ['speech','social','motor','daily'].forEach(cat => {
+    const years = parseInt(document.getElementById('ageYears') ? document.getElementById('ageYears').value : 3) || 3;
+    const months = parseInt(document.getElementById('ageMonths') ? document.getElementById('ageMonths').value : 4) || 4;
+    const tier = getAgeTier(years, months);
+    const tierItems = tier[cat] || [];
+    const custom = state.customMilestones[cat] || [];
+    const allDone = [
+      ...tierItems.filter(i => (state.milestones[cat] || {})[i.id] && state.milestones[cat][i.id].done),
+      ...custom.filter(i => i.done)
+    ];
+    const total = tierItems.length + custom.length;
+    const pct = total > 0 ? Math.round((allDone.length / total) * 100) : 0;
+    const el = document.getElementById('pct-' + cat);
+    const bar = document.getElementById('bar-' + cat);
+    if (el) el.textContent = pct + '%';
+    if (bar) bar.style.width = pct + '%';
+  });
+}
+
+// ── DOCUMENTS ──
+let currentOpenFolder = null;
+
+function renderDocuments() {
+  const grid = document.getElementById('docsGrid');
+  grid.innerHTML = '';
+  Object.keys(folderMeta).forEach(key => {
+    const meta = folderMeta[key];
+    const files = state.docs[key];
+    const div = document.createElement('div');
+    div.className = 'doc-folder-compact';
+    div.innerHTML = `
+      <span class="folder-icon">${meta.icon}</span>
+      <div class="folder-info">
+        <div class="folder-name">${meta.name}</div>
+        <div class="folder-count">${files.length} file${files.length !== 1 ? 's' : ''}</div>
+      </div>
+      <button class="open-folder-btn" onclick="openFolderModal('${key}')">Open Folder →</button>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function openFolderModal(folderKey) {
+  currentOpenFolder = folderKey;
+  const meta = folderMeta[folderKey];
+  document.getElementById('folderModalIcon').textContent = meta.icon;
+  document.getElementById('folderModalTitle').textContent = meta.name;
+  document.getElementById('folderSearch').value = '';
+  document.getElementById('folderModal').classList.add('open');
+  renderFolderModal();
+}
+
+function closeFolderModal() {
+  document.getElementById('folderModal').classList.remove('open');
+  currentOpenFolder = null;
+  renderDocuments();
+}
+
+function renderFolderModal() {
+  if (!currentOpenFolder) return;
+  const files = state.docs[currentOpenFolder] || [];
+  const search = document.getElementById('folderSearch').value.toLowerCase();
+  const container = document.getElementById('folderModalContent');
+  const countEl = document.getElementById('folderFileCount');
+
+  const filtered = files.filter(f => f.name.toLowerCase().includes(search));
+  countEl.textContent = `${filtered.length} file${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="folder-empty">${search ? 'No files match your search.' : 'No documents yet — upload your first one!'}</div>`;
+    return;
+  }
+
+  // Group by month
+  const groups = {};
+  filtered.forEach((f, originalIndex) => {
+    const month = f.date ? f.date.split(',')[0].trim().split(' ').slice(0,2).join(' ') : 'Unknown date';
+    if (!groups[month]) groups[month] = [];
+    groups[month].push({ ...f, originalIndex: files.indexOf(f) });
+  });
+
+  let html = '';
+  Object.keys(groups).forEach(month => {
+    html += `<div class="folder-month-group">
+      <div class="folder-month-label">${month}</div>`;
+    groups[month].forEach(f => {
+      html += `
+        <div class="folder-file-row">
+          <span class="folder-file-icon">${getFileIcon(f.name)}</span>
+          <div class="folder-file-info">
+            <div class="folder-file-name" title="${f.name}">${f.name}</div>
+            <div class="folder-file-meta">${f.date}${f.size ? ' · ' + f.size : ''}</div>
+          </div>
+          <div class="folder-file-actions">
+            ${f.data ? `<button class="folder-btn-download" onclick="downloadDoc('${currentOpenFolder}',${f.originalIndex})">⬇ Open</button>` : ''}
+            <button class="folder-btn-delete" onclick="deleteFolderDoc('${currentOpenFolder}',${f.originalIndex})">✕</button>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function deleteFolderDoc(folder, index) {
+  state.docs[folder].splice(index, 1);
+  renderFolderModal();
+  saveState();
+  showToast('File removed.');
+}
+
+// Close modal when clicking backdrop
+document.getElementById('folderModal').addEventListener('click', function(e) {
+  if (e.target === this) closeFolderModal();
+});
+
+function getFileIcon(name) {
+  if (name.match(/\.pdf$/i)) return '📄';
+  if (name.match(/\.(jpg|jpeg|png|gif)$/i)) return '🖼️';
+  if (name.match(/\.(doc|docx)$/i)) return '📝';
+  if (name.match(/\.(eml|msg)$/i)) return '📧';
+  if (name.match(/\.(xlsx|xls|csv)$/i)) return '📊';
+  if (name.match(/\.txt$/i)) return '📃';
+  return '📎';
+}
+
+function triggerDocUpload(folder) {
+  state.currentDocFolder = folder;
+  document.getElementById('docUploadInput').click();
+}
+
+function handleDocUpload(input) {
+  if (!state.currentDocFolder) return;
+  const files = Array.from(input.files);
+  let processed = 0;
+  if (files.length === 0) return;
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Store file as base64 data so it can be downloaded later
+      state.docs[state.currentDocFolder].push({
+        name: file.name,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        data: e.target.result,
+        type: file.type,
+        size: (file.size / 1024).toFixed(0) + ' KB'
+      });
+      processed++;
+      if (processed === files.length) {
+        input.value = '';
+        renderDocuments();
+        if (currentOpenFolder) renderFolderModal();
+        updateDashboard();
+        saveState();
+        showToast(`✅ ${files.length > 1 ? files.length + ' files' : 'File'} saved!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function downloadDoc(folder, index) {
+  const file = state.docs[folder][index];
+  if (!file || !file.data) return;
+  const a = document.createElement('a');
+  a.href = file.data;
+  a.download = file.name;
+  a.click();
+}
+
+function deleteDoc(folder, index) {
+  state.docs[folder].splice(index, 1);
+  renderDocuments();
+  updateDashboard();
+  saveState();
+  showToast('File removed.');
+}
+
+// ── JOURNAL ──
+function selectMood(btn) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.className = 'mood-btn');
+  state.selectedMood = btn.dataset.mood;
+  btn.classList.add('selected-' + state.selectedMood);
+}
+
+function handleJournalPhotos(input) {
+  Array.from(input.files).forEach(file => {
+    // Compress to max 800x800 at 65% quality for journal photos
+    compressImage(file, 800, 800, 0.65, (compressed) => {
+      state.journalPhotos.push(compressed);
+      renderJournalPhotoPreview();
+    });
+  });
+  input.value = '';
+}
+
+function renderJournalPhotoPreview() {
+  const preview = document.getElementById('journalPhotoPreview');
+  preview.innerHTML = state.journalPhotos.map(src =>
+    `<div class="photo-thumb"><img src="${src}" alt="photo"></div>`
+  ).join('');
+}
+
+function saveJournalEntry() {
+  const text = document.getElementById('journalText').value.trim();
+  if (!text && !state.selectedMood) {
+    showToast('Please add a mood or write something first.');
+    return;
+  }
+  const entry = {
+    mood: state.selectedMood || 'okay',
+    text: text,
+    photos: [...state.journalPhotos],
+    date: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
+    dateShort: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  };
+  state.journals.unshift(entry);
+
+  // Reset form
+  document.getElementById('journalText').value = '';
+  document.querySelectorAll('.mood-btn').forEach(b => b.className = 'mood-btn');
+  state.selectedMood = null;
+  state.journalPhotos = [];
+  document.getElementById('journalPhotoPreview').innerHTML = '';
+
+  renderJournalEntries();
+  updateDashboard();
+  saveState();
+  showToast('Entry saved.');
+}
+
+function renderJournalEntries() {
+  const list = document.getElementById('journalEntriesList');
+  if (state.journals.length === 0) {
+    list.innerHTML = '<div class="no-entries">Your journal entries will appear here after you save your first one.</div>';
+    return;
+  }
+  list.innerHTML = state.journals.map((entry, index) => `
+    <div class="journal-entry-card" style="position:relative;">
+      <button onclick="deleteJournalEntry(${index})" title="Delete entry" style="position:absolute;top:0.6rem;right:0.6rem;background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.8rem;opacity:0.5;transition:opacity 0.15s;padding:0.2rem;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">✕</button>
+      <div class="entry-header">
+        <span class="entry-mood-badge badge-${entry.mood}">${moodLabels[entry.mood]}</span>
+        <span class="entry-date-text">${entry.date || entry.dateShort}</span>
+      </div>
+      ${entry.text ? `<div class="entry-body">${entry.text}</div>` : ''}
+      ${entry.photos && entry.photos.length > 0 ? `<div class="entry-photos">${entry.photos.map(src => `<div class="entry-photo-thumb"><img src="${src}" alt="photo"></div>`).join('')}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function deleteJournalEntry(index) {
+  if (!confirm('Delete this journal entry? This cannot be undone.')) return;
+  state.journals.splice(index, 1);
+  renderJournalEntries();
+  updateDashboard();
+  saveState();
+  showToast('Entry deleted.');
+}
+
+// ── DASHBOARD ──
+const DECLAN_BIRTHDAY = new Date('2022-10-26');
+
+function calculateAge(birthday) {
+  const today = new Date();
+  let years = today.getFullYear() - birthday.getFullYear();
+  let months = today.getMonth() - birthday.getMonth();
+  if (months < 0) { years--; months += 12; }
+  if (today.getDate() < birthday.getDate()) { months--; if (months < 0) { years--; months += 11; } }
+  return { years, months };
+}
+
+function updateDashboard() {
+  // Auto-calculate Declan's age from birthday
+  const age = calculateAge(DECLAN_BIRTHDAY);
+  const ageEl = document.getElementById('profileAge');
+  if (ageEl) ageEl.textContent = `${age.years} year${age.years !== 1 ? 's' : ''}, ${age.months} month${age.months !== 1 ? 's' : ''}`;
+
+  // Keep milestones age fields in sync
+  const ageYearsEl = document.getElementById('ageYears');
+  const ageMonthsEl = document.getElementById('ageMonths');
+  if (ageYearsEl) ageYearsEl.value = age.years;
+  if (ageMonthsEl) ageMonthsEl.value = age.months;
+
+  // Update age tier label if on milestones page
+  const tierLabel = document.getElementById('ageTierLabel');
+  if (tierLabel) {
+    const tier = getAgeTier(age.years, age.months);
+    if (tier) tierLabel.textContent = tier.label;
+  }
+  // Stat counts
+  document.getElementById('statEntries').textContent = state.journals.length;
+  const totalDocs = Object.values(state.docs).reduce((a, b) => a + b.length, 0);
+  document.getElementById('statDocs').textContent = totalDocs;
+  const totalGoals = Object.values(state.therapyGoals).flat().filter(g => g.done).length;
+  document.getElementById('statMilestones').textContent = totalGoals;
+
+  // Update therapy goals mini bars
+  const tgCats = { aba:'terracotta', speech:'dusty-blue', music:'purple', parents:'sage' };
+  ['aba','speech','music','parents'].forEach(cat => {
+    const goals = state.therapyGoals[cat] || [];
+    const pct = goals.length > 0 ? Math.round((goals.filter(g => g.done).length / goals.length) * 100) : 0;
+    const el = document.getElementById('pct-' + cat);
+    const bar = document.getElementById('bar-' + cat);
+    if (el) el.textContent = pct + '%';
+    if (bar) bar.style.width = pct + '%';
+  });
+  document.getElementById('statMilestones').textContent = totalMilestones;
+
+  // Recent journal entries
+  const container = document.getElementById('dashboardEntries');
+  if (state.journals.length === 0) {
+    container.innerHTML = '<div class="doc-empty">No entries yet — start your first journal entry!</div>';
+  } else {
+    container.innerHTML = state.journals.slice(0, 3).map(entry => `
+      <div class="entry-item mood-${entry.mood}">
+        <div>
+          <div class="entry-text">${entry.text ? entry.text.substring(0, 80) + (entry.text.length > 80 ? '…' : '') : moodLabels[entry.mood]}</div>
+        </div>
+        <div class="entry-meta">${entry.dateShort}<br><span style="font-size:0.8rem">${moodLabels[entry.mood]}</span></div>
+      </div>
+    `).join('');
+  }
+  updateMiniStats();
+}
+
+// ── MONTHLY HIGHLIGHTS ──
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const catTagClass = { general:'htag-general', speech:'htag-speech', social:'htag-social', motor:'htag-motor', daily:'htag-daily' };
+const catLabels = { general:'General', speech:'Speech', social:'Social', motor:'Motor', daily:'Daily Living' };
+
+function initHighlightsPage() {
+  const now = new Date();
+  document.getElementById('hlMonth').value = now.getMonth();
+  document.getElementById('hlYear').value = now.getFullYear();
+  renderMonthView();
+}
+
+function selectWeek(btn) {
+  document.querySelectorAll('.week-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.hlSelectedWeek = parseInt(btn.dataset.week);
+}
+
+function selectHCat(btn) {
+  document.querySelectorAll('.hcat-btn').forEach(b => b.classList.remove('hcat-active'));
+  btn.classList.add('hcat-active');
+  state.hlSelectedCat = btn.dataset.cat;
+}
+
+function getHlKey(month, year) { return `${year}-${month}`; }
+
+function addHighlight() {
+  const text = document.getElementById('hlText').value.trim();
+  if (!text) { showToast('Please write a moment to add.'); return; }
+  const month = parseInt(document.getElementById('hlMonth').value);
+  const year = parseInt(document.getElementById('hlYear').value);
+  const key = getHlKey(month, year);
+  if (!state.highlights[key]) state.highlights[key] = { w1:[], w2:[], w3:[], w4:[] };
+  const weekKey = 'w' + state.hlSelectedWeek;
+  state.highlights[key][weekKey].push({ text, cat: state.hlSelectedCat, id: Date.now() });
+  document.getElementById('hlText').value = '';
+  renderMonthView();
+  saveState();
+  showToast('Highlight added!');
+}
+
+function deleteHighlight(hlKey, weekKey, id) {
+  state.highlights[hlKey][weekKey] = state.highlights[hlKey][weekKey].filter(h => h.id !== id);
+  renderMonthView();
+  saveState();
+}
+
+function renderMonthView() {
+  const month = parseInt(document.getElementById('hlMonth').value);
+  const year = parseInt(document.getElementById('hlYear').value);
+  const key = getHlKey(month, year);
+  const data = state.highlights[key];
+  const container = document.getElementById('hlMonthView');
+  const title = document.getElementById('monthViewTitle');
+  title.textContent = `${monthNames[month]} ${year} — Highlights`;
+
+  if (!data || Object.values(data).every(w => w.length === 0)) {
+    container.innerHTML = '<div class="no-highlights">No highlights yet for this month. Add your first one!</div>';
+    return;
+  }
+
+  let html = '';
+  ['w1','w2','w3','w4'].forEach((wk, i) => {
+    const entries = (data[wk] || []);
+    if (entries.length === 0) return;
+    html += `<div class="week-section">
+      <div class="week-section-title">Week ${i+1}</div>
+      ${entries.map(h => `
+        <div class="highlight-entry">
+          <div class="highlight-bullet cat-${h.cat}"></div>
+          <div class="highlight-text">${h.text}</div>
+          <span class="highlight-cat-tag ${catTagClass[h.cat]}">${catLabels[h.cat]}</span>
+          <button class="delete-highlight" onclick="deleteHighlight('${key}','${wk}',${h.id})" title="Remove">✕</button>
+        </div>
+      `).join('')}
+    </div>`;
+  });
+  container.innerHTML = html || '<div class="no-highlights">No highlights yet for this month.</div>';
+}
+
+// ── RESEARCH ──
+const sourceTypeMeta = {
+  website: { label: '🌐 Website', badgeClass: 'badge-website' },
+  book:    { label: '📚 Book',    badgeClass: 'badge-book' },
+  doctor:  { label: '🩺 Doctor',  badgeClass: 'badge-doctor' },
+  video:   { label: '🎥 Video',   badgeClass: 'badge-video' },
+  study:   { label: '🔬 Study',   badgeClass: 'badge-study' },
+};
+
+function selectSourceType(btn) {
+  document.querySelectorAll('.source-type-btn').forEach(b => b.classList.remove('stype-active'));
+  btn.classList.add('stype-active');
+  state.researchSelectedType = btn.dataset.type;
+}
+
+function selectStar(n) {
+  state.researchSelectedStars = n;
+  document.querySelectorAll('.star-btn').forEach((btn, i) => {
+    btn.classList.toggle('lit', i < n);
+  });
+}
+
+function selectResearchFilter(btn) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('factive'));
+  btn.classList.add('factive');
+  state.researchFilterType = btn.dataset.filter;
+  renderResearch();
+}
+
+function saveResearch() {
+  const title = document.getElementById('researchTitle').value.trim();
+  const summary = document.getElementById('researchSummary').value.trim();
+  if (!title) { showToast('Please add a title.'); return; }
+  if (!state.researchSelectedType) { showToast('Please select a source type.'); return; }
+
+  const entry = {
+    id: Date.now(),
+    type: state.researchSelectedType,
+    title,
+    author: document.getElementById('researchAuthor').value.trim(),
+    url: document.getElementById('researchUrl').value.trim(),
+    summary,
+    stars: state.researchSelectedStars,
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+  };
+  state.research.unshift(entry);
+
+  // Reset form
+  document.getElementById('researchTitle').value = '';
+  document.getElementById('researchAuthor').value = '';
+  document.getElementById('researchUrl').value = '';
+  document.getElementById('researchSummary').value = '';
+  document.querySelectorAll('.source-type-btn').forEach(b => b.classList.remove('stype-active'));
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('lit'));
+  state.researchSelectedType = null;
+  state.researchSelectedStars = 0;
+
+  renderResearch();
+  saveState();
+  showToast('Research saved to library!');
+}
+
+function deleteResearch(id) {
+  state.research = state.research.filter(r => r.id !== id);
+  renderResearch();
+  saveState();
+  showToast('Entry removed.');
+}
+
+function renderResearch() {
+  const grid = document.getElementById('researchGrid');
+  if (!grid) return;
+  const filter = state.researchFilterType || 'all';
+  const search = (document.getElementById('researchSearchInput') ? document.getElementById('researchSearchInput').value : '').toLowerCase();
+
+  let items = state.research.filter(r => {
+    const matchFilter = filter === 'all' || r.type === filter;
+    const matchSearch = !search || r.title.toLowerCase().includes(search) || (r.author && r.author.toLowerCase().includes(search)) || (r.summary && r.summary.toLowerCase().includes(search));
+    return matchFilter && matchSearch;
+  });
+
+  if (items.length === 0) {
+    grid.innerHTML = `<div class="research-empty">${state.research.length === 0 ? 'Your research library is empty — add your first entry!' : 'No entries match your filter or search.'}</div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(r => {
+    const meta = sourceTypeMeta[r.type] || { label: r.type, badgeClass: '' };
+    const stars = r.stars > 0 ? '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars) : '';
+    return `
+      <div class="research-card">
+        <button class="research-card-delete" onclick="deleteResearch(${r.id})" title="Remove">✕</button>
+        <div class="research-card-header">
+          <span class="source-badge ${meta.badgeClass}">${meta.label}</span>
+        </div>
+        <div class="research-card-title">${r.title}</div>
+        ${r.author ? `<div class="research-card-author">by ${r.author}</div>` : ''}
+        ${r.summary ? `<div class="research-card-summary">${r.summary}</div>` : ''}
+        ${r.url ? `<a href="${r.url}" target="_blank" class="research-card-link">🔗 ${r.url}</a>` : ''}
+        <div class="research-card-footer">
+          <span class="research-card-date">${r.date}</span>
+          ${stars ? `<span class="research-card-stars" style="color:#f5a623">${stars}</span>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── THERAPY GOALS ──
+const tgoalMeta = {
+  aba:     { name: 'ABA Therapy',    icon: '🧩', color: 'fill-speech' },
+  speech:  { name: 'Speech Therapy', icon: '🗣️', color: 'fill-speech' },
+  music:   { name: 'Music Therapy',  icon: '🎵', color: 'fill-motor' },
+  parents: { name: "Parents' Goals", icon: '👨‍👩‍👦', color: 'fill-daily' },
+};
+
+const tgoalBarColors = {
+  aba:     'linear-gradient(90deg, var(--terracotta), #e8a07a)',
+  speech:  'linear-gradient(90deg, var(--dusty-blue), var(--dusty-blue-light))',
+  music:   'linear-gradient(90deg, #7b5ea7, #b89fd4)',
+  parents: 'linear-gradient(90deg, var(--sage), var(--sage-light))',
+};
+
+function renderTherapyGoals() {
+  const layout = document.getElementById('therapyGoalsLayout');
+  if (!layout) return;
+  layout.innerHTML = '<div class="tgoals-grid" id="tgoalsGrid"></div>';
+  const grid = document.getElementById('tgoalsGrid');
+
+  Object.keys(tgoalMeta).forEach(cat => {
+    const meta = tgoalMeta[cat];
+    const goals = state.therapyGoals[cat] || [];
+    const done = goals.filter(g => g.done).length;
+    const total = goals.length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    const div = document.createElement('div');
+    div.className = 'tgoal-category';
+    div.innerHTML = `
+      <div class="tgoal-cat-header">
+        <span class="tgoal-cat-icon">${meta.icon}</span>
+        <div class="tgoal-cat-name">${meta.name}</div>
+        <div class="tgoal-progress-wrap">
+          <div class="tgoal-pct">${pct}%</div>
+          <div class="tgoal-fraction">${done} of ${total} done</div>
+          <div class="tgoal-bar"><div class="tgoal-bar-fill" style="width:${pct}%;background:${tgoalBarColors[cat]}"></div></div>
+        </div>
+      </div>
+      <div class="tgoal-list" id="tgoal-list-${cat}">
+        ${total === 0 ? '<div class="tgoal-empty">No goals yet — add one below!</div>' : ''}
+      </div>
+      <div class="tgoal-add-area">
+        <div class="tgoal-add-row">
+          <input type="text" class="tgoal-add-input" id="tgoal-input-${cat}" placeholder="Add a new goal..." onkeydown="if(event.key==='Enter') addTherapyGoal('${cat}')">
+          <button class="tgoal-add-btn" onclick="addTherapyGoal('${cat}')">+ Add</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(div);
+
+    // Render goal items
+    const list = document.getElementById('tgoal-list-' + cat);
+    goals.forEach(goal => {
+      const row = document.createElement('div');
+      row.className = 'tgoal-item' + (goal.done ? ' completed' : '');
+      row.innerHTML = `
+        <div class="tgoal-checkbox ${goal.done ? 'checked' : ''}" onclick="toggleTherapyGoal('${cat}','${goal.id}')">
+          ${goal.done ? '✓' : ''}
+        </div>
+        <div class="tgoal-info">
+          <div class="tgoal-label ${goal.done ? 'done' : ''}">${goal.label}</div>
+          ${goal.done && goal.dateCompleted ? `<div class="tgoal-date">✅ Completed ${goal.dateCompleted}</div>` : ''}
+          ${goal.dateAdded ? `<div class="tgoal-note">Added ${goal.dateAdded}</div>` : ''}
+        </div>
+        <button class="tgoal-delete" onclick="deleteTherapyGoal('${cat}','${goal.id}')" title="Remove goal">✕</button>
+      `;
+      list.appendChild(row);
+    });
+  });
+}
+
+function addTherapyGoal(cat) {
+  const input = document.getElementById('tgoal-input-' + cat);
+  const text = input.value.trim();
+  if (!text) { showToast('Please enter a goal first.'); return; }
+  if (!state.therapyGoals[cat]) state.therapyGoals[cat] = [];
+  state.therapyGoals[cat].push({
+    id: 'tg_' + Date.now(),
+    label: text,
+    done: false,
+    dateAdded: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    dateCompleted: null,
+  });
+  input.value = '';
+  renderTherapyGoals();
+  updateDashboard();
+  saveState();
+  showToast('Goal added!');
+}
+
+function toggleTherapyGoal(cat, id) {
+  const goal = (state.therapyGoals[cat] || []).find(g => g.id === id);
+  if (!goal) return;
+  goal.done = !goal.done;
+  goal.dateCompleted = goal.done
+    ? new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : null;
+  renderTherapyGoals();
+  updateDashboard();
+  saveState();
+  showToast(goal.done ? `🎯 "${goal.label}" completed!` : 'Goal marked incomplete.');
+}
+
+function deleteTherapyGoal(cat, id) {
+  state.therapyGoals[cat] = (state.therapyGoals[cat] || []).filter(g => g.id !== id);
+  renderTherapyGoals();
+  updateDashboard();
+  saveState();
+  showToast('Goal removed.');
+}
+
+// ── DAILY TIP ──
+const TIP_STORAGE_KEY = 'dj_dailytip';
+
+const TIPS_BY_AGE = {
+  '3to4': [
+    { category: '🗣️ Speech', tip: "Try narrating everything you do together today — 'Now I'm washing the cup, now I'm drying it.' This running commentary builds vocabulary naturally without any pressure to respond." },
+    { category: '🧩 ABA', tip: "Pick one small routine today — like putting on shoes — and break it into 3 tiny steps with a big celebration at the end. Consistent small wins build enormous confidence over time." },
+    { category: '🎵 Music', tip: "Put on slow, predictable music during a transition like getting ready for bed. Music with a steady beat helps Declan's nervous system regulate during moments that feel unpredictable." },
+    { category: '🗣️ Speech', tip: "When Declan reaches for something, pause and wait 5 seconds before helping. This 'expectant pause' creates a natural opportunity for him to communicate — even a gesture or sound counts!" },
+    { category: '💛 Connection', tip: "Follow Declan's lead for 10 minutes today with no agenda — just play with whatever he's interested in. Child-directed play is one of the most powerful ways to build trust and connection." },
+    { category: '🧩 ABA', tip: "Try a 'first-then' board today: 'First shoes, then iPad.' Visual schedules reduce anxiety because Declan can see what's coming next and feel more in control of his world." },
+    { category: '🌟 Sensory', tip: "Notice what textures, sounds, or environments make Declan most calm today. Keeping a mental note of his sensory 'green zones' helps you set him up for success in harder moments." },
+    { category: '🗣️ Speech', tip: "Read the same book twice today — the second time, pause before familiar words and see if Declan fills them in. Repetition is a superpower for language development at this age." },
+    { category: '💛 Connection', tip: "Give Declan a choice between two things today — 'Do you want the red cup or the blue cup?' Offering choices builds language, decision-making, and a sense of autonomy all at once." },
+    { category: '🧩 ABA', tip: "Celebrate any attempt to communicate today, not just perfect words. A point, a look, a sound — these are all meaningful steps. Your enthusiastic response is his biggest motivator." },
+    { category: '🎵 Music', tip: "Try singing instructions today instead of speaking them — 'Time to clean up, time to clean up!' Melodic cues often reach children with ASD more easily than spoken words." },
+    { category: '🌟 Sensory', tip: "Build in 5 minutes of heavy work before a challenging activity — jumping, pushing a laundry basket, or carrying groceries. Proprioceptive input helps regulate the nervous system." },
+    { category: '🗣️ Speech', tip: "Get down to Declan's eye level when you talk to him. Physical positioning makes communication feel more natural and less overwhelming for children who process sensory input differently." },
+    { category: '💛 Connection', tip: "Look for one moment today where Declan is regulating himself — rocking, lining things up, humming — and instead of redirecting, just sit quietly nearby. Presence without pressure is powerful." },
+    { category: '🧩 ABA', tip: "Use Declan's special interests as a bridge today. If he loves a particular toy or show, count, name colors, or make up stories using it. Engagement through passion unlocks learning." },
+    { category: '🗣️ Speech', tip: "Model language just one step above where Declan is right now. If he uses single words, respond with two-word phrases. This gentle stretch is exactly how language grows." },
+    { category: '🌟 Sensory', tip: "Create a calm corner in your home — a cozy spot with soft lighting and a few comfort items. Having a predictable safe space helps Declan self-regulate when overwhelmed." },
+    { category: '🎵 Music', tip: "Try a simple call-and-response song today — clap a rhythm and wait for Declan to repeat it. This musical turn-taking builds the same skills as conversation in a lower-pressure format." },
+    { category: '💛 Connection', tip: "Write down one thing Declan did today that surprised or delighted you. Keeping a record of small wins helps you see the progress that is easy to miss day to day." },
+    { category: '🧩 ABA', tip: "Try using a visual timer for transitions — show Declan '5 more minutes of play, then bath.' Seeing time visually reduces the anxiety of unexpected endings." },
+    { category: '🗣️ Speech', tip: "Name emotions throughout the day — 'You look frustrated. The block fell down.' Building an emotional vocabulary helps Declan understand and eventually express his own feelings." },
+    { category: '🌟 Sensory', tip: "Try a sensory bin today with dry rice, beans, or sand. Hands-in sensory play can be deeply regulating and often opens up language and play naturally." },
+    { category: '💛 Connection', tip: "Give Declan a 2-minute warning before every transition today. This simple habit dramatically reduces meltdowns by removing the shock of sudden change." },
+    { category: '🧩 ABA', tip: "Catch Declan being good — narrate it specifically: 'I love how you waited so patiently!' Specific praise is far more powerful than general encouragement at this age." },
+    { category: '🎵 Music', tip: "Play music from different genres during playtime. Varied musical experiences build auditory processing and can spark new expressions of curiosity and joy." },
+    { category: '🗣️ Speech', tip: "Try reducing questions and increasing comments today. Instead of 'What color is that?' try 'Oh, that is a red one!' Comments feel less demanding and actually invite more language back." },
+    { category: '🌟 Sensory', tip: "Notice Declan's preferred sensory input — does he seek pressure, movement, or visual stimulation? Working with his sensory needs rather than against them reduces stress for both of you." },
+    { category: '💛 Connection', tip: "Make eye contact a warm experience — smile and light up when Declan looks at you, rather than prompting or expecting it. Natural reinforcement builds the habit gently." },
+    { category: '🧩 ABA', tip: "Try errorless learning for a new skill — guide Declan through the whole task with full support, then gradually reduce your help over the next few days. Success builds confidence." },
+    { category: '🗣️ Speech', tip: "Use gestures alongside your words today — point, wave, show. Pairing gestures with speech supports comprehension and often helps children produce their own gestures and words sooner." },
+    { category: '🌟 Sensory', tip: "Bath time can be a rich sensory experience — try different water temperatures or cups for pouring. Sensory-rich routines that feel safe build regulation over time." },
+    { category: '💛 Connection', tip: "Spend 5 minutes doing absolutely nothing but watching Declan play — no coaching, no redirecting. Observation helps you understand his inner world better than almost anything else." },
+    { category: '🧩 ABA', tip: "Practice one social script today — like saying hello to a family member. Scripted language gives children with ASD a reliable tool to enter social situations with confidence." },
+    { category: '🎵 Music', tip: "Dance together to a favorite song today. Movement set to music builds body awareness, rhythm, and joyful connection simultaneously." },
+    { category: '🗣️ Speech', tip: "Try parallel talk today — describe what Declan is doing as he does it: 'You are stacking the blocks... now you are knocking them down!' This builds language without pressure." },
+    { category: '🌟 Sensory', tip: "Try deep pressure input today — a firm hug, a weighted blanket, or rolling a therapy ball over his back. Many children with ASD find this deeply calming." },
+    { category: '💛 Connection', tip: "Laugh together today. Silly faces, tickles, funny sounds — shared joy is one of the most powerful relationship builders and stress relievers for both of you." },
+    { category: '🧩 ABA', tip: "Work on one transition routine today with a consistent song or phrase to signal it is coming. Predictable cues make transitions less scary over time." },
+    { category: '🎵 Music', tip: "Let Declan lead a music session — give him an instrument and just follow along. Child-led musical play is wonderful for communication and self-expression." },
+    { category: '🗣️ Speech', tip: "Try self-talk today — narrate your own actions out loud as you do them near Declan. 'I am pouring the juice... now I am putting the cap on.' It models language without any demand." },
+    { category: '🌟 Sensory', tip: "Go outside for 10 minutes today with no agenda. Nature provides rich, natural sensory input that is regulating for most children, especially those with sensory processing differences." },
+    { category: '💛 Connection', tip: "Try imitation play today — copy exactly what Declan does and see if he notices. Imitation is a profound form of connection that says 'I see you and you matter.'" },
+    { category: '🧩 ABA', tip: "Set up a simple cause-and-effect toy today — push a button, something happens. Cause-and-effect understanding is foundational for communication and play." },
+    { category: '🗣️ Speech', tip: "Look at family photos together today and name the people and what they are doing. This builds vocabulary, social understanding, and warm connection all at once." },
+    { category: '🎵 Music', tip: "Try using a familiar song as a signal for a routine today — the same song every time for cleanup, or bedtime. Musical cues become powerful predictors that reduce anxiety." },
+    { category: '🌟 Sensory', tip: "Try blowing bubbles together today. Blowing strengthens oral motor skills, and the visual tracking of bubbles is calming and engaging for many children with ASD." },
+    { category: '💛 Connection', tip: "Validate Declan's emotions today without trying to fix them — 'You are upset. That was really hard.' Being heard is more powerful than being redirected." },
+    { category: '🧩 ABA', tip: "Practice pointing today — point to things you see and encourage Declan to do the same. Joint attention through pointing is a cornerstone of communication development." },
+    { category: '🗣️ Speech', tip: "Expand Declan's utterances today — if he says 'ball,' you say 'big red ball' or 'roll the ball.' Expansions model richer language without any pressure to repeat." },
+    { category: '🌟 Sensory', tip: "Try a simple yoga pose or animal walk together today — bear crawl, frog jumps, snake slides. These movement activities build body awareness and motor planning." },
+    { category: '💛 Connection', tip: "Create a simple goodbye ritual for when you part today — a special wave, a secret handshake, a consistent phrase. Predictable transitions ease separation anxiety." },
+    { category: '🧩 ABA', tip: "Practice matching today — match socks, match colors, match shapes. Matching is a foundational cognitive skill that also builds focus and sustained attention." },
+    { category: '🎵 Music', tip: "Try humming together today — hum a familiar tune and see if Declan joins in. Humming is an accessible form of musical expression that does not require words." },
+    { category: '🗣️ Speech', tip: "Label everything in your environment today as you encounter it — door, chair, window, spoon. Environmental labeling builds receptive vocabulary rapidly at this age." },
+    { category: '🌟 Sensory', tip: "Try finger painting or shaving cream play today. Messy sensory play, even in small amounts, builds tactile tolerance and sensory flexibility over time." },
+    { category: '💛 Connection', tip: "Tell Declan three specific things you love about him today. Specific, personal affirmations build self-concept and emotional security." },
+    { category: '🧩 ABA', tip: "Work on simple sorting today — toys in one basket, books in another. Sorting builds categorization, attention, and the satisfaction of completing a task." },
+    { category: '🗣️ Speech', tip: "Practice animal sounds together today — what does a dog say? A cow? Animal sounds are often among the first vocalizations and build phonological awareness." },
+    { category: '🎵 Music', tip: "Try a lullaby at bedtime tonight — even if he is past the baby stage, gentle familiar songs signal safety and help the nervous system downregulate for sleep." },
+    { category: '🌟 Sensory', tip: "Make a calm-down jar today — fill a bottle with water, glitter glue, and glitter. Shaking it and watching the glitter settle is a simple, effective regulation tool." },
+    { category: '💛 Connection', tip: "Read a book about feelings today. Naming characters' emotions builds emotional vocabulary in a safe, indirect way." },
+    { category: '🧩 ABA', tip: "Practice 'my turn, your turn' today with a simple toy or activity. Turn-taking is the foundation of all social interaction and conversation." },
+    { category: '🗣️ Speech', tip: "Use real objects alongside words today — when you say 'cup,' hold up the cup. Pairing words with objects strengthens word-meaning connections at this stage." },
+    { category: '🌟 Sensory', tip: "Try a warm, scented bath with lavender tonight. Consistent sensory routines before bed help the nervous system recognize it is time to wind down." },
+    { category: '💛 Connection', tip: "Make a feelings chart together today with simple face drawings. Having a visual reference for emotions gives Declan a tool to point to when words are not available." },
+    { category: '🧩 ABA', tip: "Work on simple two-step instructions today — 'Pick up the ball and put it in the box.' Following multi-step directions is a key milestone for this age group." },
+    { category: '🎵 Music', tip: "Introduce a simple xylophone or keyboard today. Free exploration of an instrument builds cause-and-effect understanding and musical curiosity without any pressure." },
+    { category: '🗣️ Speech', tip: "Practice 'more' and 'all done' today — two of the most functional early communication words. Even signing these builds intentional communication." },
+    { category: '🌟 Sensory', tip: "Try a movement break every 20 minutes today — jump, spin, roll. Children with sensory processing differences often need regular movement to stay regulated and focused." },
+    { category: '💛 Connection', tip: "Sit on the floor at Declan's level today rather than hovering above. Physical equality in space changes the dynamic of interaction in subtle but meaningful ways." },
+    { category: '🧩 ABA', tip: "Work on 'in' and 'out' today — put things in a box, take them out. Basic spatial concepts like in, out, on, and under are foundational language and cognitive milestones." },
+    { category: '🗣️ Speech', tip: "Pause mid-sentence today and see if Declan fills in the word — 'Time to eat...' Cloze procedures are wonderful for eliciting language in familiar routines." },
+    { category: '🎵 Music', tip: "Move to the rhythm together today — clap, stomp, tap knees to a beat. Rhythmic movement is organizing for the nervous system and joyful for the whole body." },
+    { category: '🌟 Sensory', tip: "Try a sensory walk today — look for five things you can see, listen for two sounds, feel different surfaces. Guided sensory awareness builds regulation and attention." },
+    { category: '💛 Connection', tip: "Say 'I am proud of you because...' with a specific reason today. Specific, genuine praise lands differently than general approval and builds real self-esteem." },
+    { category: '🧩 ABA', tip: "Create a visual schedule for tomorrow and review it with Declan tonight. Knowing what is coming tomorrow reduces morning anxiety and helps him feel prepared." },
+    { category: '🗣️ Speech', tip: "Practice requesting today — set up a situation where Declan needs to ask for something. Functional requesting is one of the most important communication skills to develop." },
+    { category: '🌟 Sensory', tip: "Try wearing headphones with calm music in a loud or busy environment today. Giving Declan sensory tools he can use independently builds self-regulation skills over time." },
+    { category: '💛 Connection', tip: "Do a puzzle together today with no time pressure. Shared focus activities build parallel attention and create natural moments for language without it being the point." },
+    { category: '🧩 ABA', tip: "Work on 'stop' today — practice stopping when you say the word in a fun game like freeze tag. 'Stop' is one of the most important safety words to teach early." },
+    { category: '🗣️ Speech', tip: "Practice 'yes' and 'no' responses today in low-stakes situations — 'Do you want a snack? Yes or no?' Clear yes/no communication is hugely functional." },
+    { category: '🎵 Music', tip: "Play a simple game of 'loud and quiet' with music today — turn it up, turn it down. This builds auditory awareness and also gives Declan a sense of control over sensory input." },
+    { category: '🌟 Sensory', tip: "Try a body squeeze — gentle firm pressure from shoulders down to feet. Many children with ASD find this organizing and calming, especially before demanding activities." },
+    { category: '💛 Connection', tip: "Share a meal together with no screens today. Mealtime conversation, even one-sided, exposes Declan to social communication patterns that gradually become familiar." },
+    { category: '🧩 ABA', tip: "Work on identifying body parts today through a fun song or game. Body awareness is foundational for self-care, safety, and physical communication." },
+    { category: '🗣️ Speech', tip: "Practice greetings with stuffed animals or puppets today. Using props to rehearse social scripts reduces the pressure and makes practice feel like play." },
+    { category: '🌟 Sensory', tip: "Try cooking or baking together today — measuring, pouring, mixing. Kitchen activities are rich in sensory input, language, and sequencing all at once." },
+    { category: '💛 Connection', tip: "Put your phone away for 30 minutes today and be fully present. Children notice undivided attention, and it communicates something words alone cannot." },
+    { category: '🧩 ABA', tip: "Work on 'big' and 'little' today using objects around the house. Comparative concepts like big/little, hot/cold, and fast/slow are important early language goals." },
+    { category: '🎵 Music', tip: "Create a morning song today — a consistent, upbeat song that signals the start of the day. Musical anchors for routines build predictability and positive anticipation." },
+    { category: '🗣️ Speech', tip: "Point out people's actions throughout the day — 'Daddy is eating. The dog is running.' Action words are one of the most important early vocabulary categories." },
+    { category: '🌟 Sensory', tip: "Try a simple spinning activity today — a spin on a chair, spinning in a circle. Vestibular input through rotation is organizing for many children with sensory differences." },
+    { category: '💛 Connection', tip: "Create a bedtime ritual that Declan can predict and rely on. Consistent end-of-day routines reduce bedtime anxiety and build a sense of safety." },
+    { category: '🧩 ABA', tip: "Practice transitioning between two preferred activities today — not just hard-to-easy. Learning to transition from something good builds real flexibility." },
+    { category: '🗣️ Speech', tip: "Use Declan's name before key information today — 'Declan, look!' Using his name as a cue trains his attention and increases how much language he actually processes." },
+    { category: '🎵 Music', tip: "Try marching together to music today. Marching builds bilateral coordination, rhythm, and body awareness in a fun, structured way." },
+    { category: '🌟 Sensory', tip: "Try a food exploration activity today — smell, touch, and name foods without any pressure to eat them. Sensory familiarity is the first step toward food acceptance." },
+    { category: '💛 Connection', tip: "Make a memory book page today about something special this week. Looking back at memories together builds narrative and identity." },
+    { category: '🧩 ABA', tip: "Work on waiting for a preferred item today — hold up the snack and wait 3 seconds before giving it. Building the pause between desire and receiving is a foundational self-regulation skill." },
+    { category: '🗣️ Speech', tip: "Try recasting today — when Declan says something incorrectly, respond with the correct form naturally without drawing attention to the error. 'Goed' becomes 'Yes, you went outside!'" },
+    { category: '🌟 Sensory', tip: "Try a gentle massage today using lotion on hands and arms. Tactile input through massage is deeply regulating and a wonderful bonding activity." },
+    { category: '💛 Connection', tip: "Ask Declan to help you with a simple task today — hold this, carry this, pass me that. Contributing to the household builds belonging and competence." },
+    { category: '🧩 ABA', tip: "Practice one functional life skill today — putting dirty clothes in the hamper, throwing away trash. Independence in daily tasks builds confidence and self-sufficiency." },
+    { category: '🎵 Music', tip: "Listen to classical music during a quiet activity today. Structured classical music supports attention and calm focus in children with sensory differences." },
+    { category: '🗣️ Speech', tip: "Practice 'help' today — if Declan is struggling with something, wait for him to request help before jumping in. Asking for help is a life-changing communication skill." },
+  ],
+  '4to5': [
+    { category: '🗣️ Speech', tip: "Practice storytelling today — ask Declan to tell you about something he did, and help fill in the gaps. Narrative language is a key developmental leap around age 4." },
+    { category: '🧩 ABA', tip: "Work on identifying feelings in others today — look at faces in a book or show and name what that person might be feeling. Perspective-taking grows significantly between ages 4 and 5." },
+    { category: '🎵 Music', tip: "Try learning a new song together today with simple movements or actions. Action songs build memory, sequencing, and body coordination all at once." },
+    { category: '💛 Connection', tip: "Set up a simple cooperative activity today — building something together, cooking, or a puzzle. Shared projects build teamwork and give natural opportunities for communication." },
+    { category: '🗣️ Speech', tip: "Practice 'why' questions today — when Declan does something, ask 'why did you do that?' and help him construct an answer. Causal language is a big focus at this age." },
+    { category: '🧩 ABA', tip: "Work on waiting skills today using a small visual countdown. Being able to wait 1-2 minutes is a foundational skill for preschool and group settings." },
+    { category: '🌟 Sensory', tip: "Try a nature sensory walk today — touch tree bark, feel grass, smell flowers. Naming sensory experiences in nature builds vocabulary and sensory tolerance simultaneously." },
+    { category: '🗣️ Speech', tip: "Practice describing objects today — 'It is round, it is red, you eat it — what is it?' This builds vocabulary, memory, and the ability to communicate when a word is forgotten." },
+    { category: '💛 Connection', tip: "Play a simple board game or card game together today. Turn-taking games build patience, social rules understanding, and joyful interaction." },
+    { category: '🧩 ABA', tip: "Work on a self-care skill today — washing hands, brushing teeth, getting dressed. Break it into picture steps and let Declan do as much independently as he can." },
+    { category: '🎵 Music', tip: "Try rhythm copying today — tap a simple pattern and ask Declan to copy it. This builds auditory processing, memory, and the back-and-forth of communication." },
+    { category: '🌟 Sensory', tip: "Try playdough or clay today. The resistance of manipulating dough builds hand strength, and the tactile input is organizing for many children with sensory differences." },
+    { category: '🗣️ Speech', tip: "Practice 'wh' questions in a game format today. 'Where does a dog live? Who wears a hat?' Making it playful keeps engagement high and pressure low." },
+    { category: '💛 Connection', tip: "Look through photos of Declan together today and talk about the memories. This builds narrative language, autobiographical memory, and warm connection." },
+    { category: '🧩 ABA', tip: "Practice greetings today — saying hello and goodbye to family members. Social rituals like greetings are an important bridge to peer relationships." },
+    { category: '🎵 Music', tip: "Try freeze dance today — music plays, everyone dances; music stops, everyone freezes. It builds body control, listening skills, and is genuinely fun." },
+    { category: '🌟 Sensory', tip: "Try an obstacle course inside or outside today. Crawling through, jumping over, and balancing on things builds body awareness and motor planning." },
+    { category: '🗣️ Speech', tip: "Practice sequencing today — 'First we... then we... last we...' Sequencing language builds narrative skills and helps Declan understand and predict daily routines." },
+    { category: '💛 Connection', tip: "Let Declan teach you something today — about his favorite subject, toy, or interest. Being the expert builds confidence and is a wonderful reversal of the usual dynamic." },
+    { category: '🧩 ABA', tip: "Work on flexible thinking today — if something does not go as expected, narrate it calmly: 'That did not work, let us try a different way.' Modeling flexibility reduces rigidity over time." },
+    { category: '🎵 Music', tip: "Introduce simple music concepts today — fast/slow, loud/quiet. These musical contrasts also map onto emotional and sensory regulation concepts." },
+    { category: '🌟 Sensory', tip: "Try a calm breathing exercise with Declan today — 'smell the flowers, blow out the candles.' Simple breath work is a powerful self-regulation tool to introduce at this age." },
+    { category: '🗣️ Speech', tip: "Practice category sorting today — foods, animals, vehicles. Categorical thinking is a major language and cognitive milestone between ages 4 and 5." },
+    { category: '💛 Connection', tip: "Create a small photo book of Declan's favorite people and things. Social stories with real photos are powerful tools for building understanding and reducing anxiety." },
+    { category: '🧩 ABA', tip: "Practice complimenting others today — 'I like your shirt!' Starting with scripted compliments builds the social habit naturally." },
+    { category: '🌟 Sensory', tip: "Try a mindful eating moment today — smell, touch, and describe food before eating it. This builds sensory tolerance, vocabulary, and can help with food acceptance." },
+    { category: '🗣️ Speech', tip: "Practice retelling a familiar story today using pictures or toys. Story retelling builds sequencing, memory, and narrative language." },
+    { category: '💛 Connection', tip: "Have a special 10-minute one-on-one time today with no screens — just you and Declan doing whatever he chooses. Undivided attention is deeply nourishing." },
+    { category: '🧩 ABA', tip: "Work on asking for help today — 'Can you help me please?' This phrase is enormously useful and reduces frustration across many settings." },
+    { category: '🎵 Music', tip: "Try making homemade instruments today — fill bottles with rice, bang pots, stretch rubber bands. Creative music-making builds curiosity and sensory exploration." },
+    { category: '🗣️ Speech', tip: "Practice using pronouns correctly today — he, she, they, I, you. Pronoun use is a major focus at this age and often needs explicit practice for children with ASD." },
+    { category: '🌟 Sensory', tip: "Try walking barefoot on different surfaces today — grass, carpet, tile. Varied foot sensory input builds tactile awareness and grounding in the body." },
+    { category: '💛 Connection', tip: "Role-play a scenario together today — going to the doctor, ordering food, meeting someone new. Rehearsing real-world situations builds confidence and reduces anxiety." },
+    { category: '🧩 ABA', tip: "Work on staying on topic in a short conversation today. Introduce a topic, make two exchanges, then close it. Teaching conversation structure explicitly is very helpful." },
+    { category: '🎵 Music', tip: "Try identifying instruments by sound today — close your eyes and guess. Auditory discrimination builds listening skills that support both music and language development." },
+    { category: '🗣️ Speech', tip: "Practice describing people today — tall, short, long hair, glasses. Descriptive language about people supports social observation and communication." },
+    { category: '🌟 Sensory', tip: "Try a body scan relaxation exercise today — notice how each part of your body feels, from toes to head. This builds body awareness and is a powerful calming tool." },
+    { category: '💛 Connection', tip: "Start a simple gratitude practice tonight — each say one thing you are thankful for today. This builds positive emotional habits and reflective language." },
+    { category: '🧩 ABA', tip: "Work on transitioning from a screen today using a consistent warning system. 'Two more minutes, then we turn it off' with a timer builds self-regulation around technology." },
+    { category: '🎵 Music', tip: "Create a playlist of Declan's favorite songs together. Having his own music playlist gives him agency over his sensory environment — a powerful self-regulation tool." },
+    { category: '🗣️ Speech', tip: "Practice asking 'what' questions today — 'What is that? What are you doing?' Asking questions is a significant social and language milestone at this age." },
+    { category: '🌟 Sensory', tip: "Try a heavy work break before a demanding task today — push-ups, wall pushes, carrying something heavy. This organizes the nervous system for focused work." },
+    { category: '💛 Connection', tip: "Build something together with blocks, LEGO, or cardboard today. Construction play builds spatial reasoning, planning, and collaboration." },
+    { category: '🧩 ABA', tip: "Practice taking turns in conversation today — you say something, Declan responds, you respond back. Conversational turn-taking is a skill that needs explicit practice." },
+    { category: '🎵 Music', tip: "Try singing Declan's name in different silly ways today. Name songs build phonological awareness and are a joyful way to connect through sound." },
+    { category: '🗣️ Speech', tip: "Work on past tense today — 'What did we do today?' Help Declan form past tense sentences with support. Past tense is a major grammatical milestone between 4 and 5." },
+    { category: '🌟 Sensory', tip: "Try making slime or cornstarch oobleck today. Non-Newtonian fluids are endlessly fascinating and provide unique tactile and visual sensory input." },
+    { category: '💛 Connection', tip: "Draw portraits of each other today. Mutual portrait-making is funny, connecting, and also a great way to observe how Declan sees and represents people." },
+    { category: '🧩 ABA', tip: "Work on accepting 'no' gracefully today — practice hearing 'not right now' with calm and then getting the thing a few minutes later. Building tolerance for delay is essential." },
+    { category: '🎵 Music', tip: "Explore call and response in music today — you sing a phrase, Declan echoes it back. This musical conversation builds auditory memory and the pattern of communication." },
+    { category: '🗣️ Speech', tip: "Practice opposites today — big/small, hot/cold, fast/slow, happy/sad. Opposite pairs build flexible vocabulary and conceptual thinking." },
+    { category: '🌟 Sensory', tip: "Try a sensory diet check-in today — what does Declan's body need? More movement? More calm? More pressure? Building this self-awareness is a lifelong skill." },
+    { category: '💛 Connection', tip: "Watch Declan's favorite show with him today and ask him to explain what is happening. Sharing his passions shows genuine interest and builds language around preferred topics." },
+    { category: '🧩 ABA', tip: "Work on greeting peers today — a wave, a 'hi,' even eye contact. Peer greetings are the first step toward friendship and need scaffolding at this stage." },
+    { category: '🎵 Music', tip: "Try musical storytelling today — play different pieces of music and make up a story to match the mood. This builds imaginative thinking and emotional expression." },
+    { category: '🗣️ Speech', tip: "Practice plurals today — one dog, two dogs; one foot, two feet. Regular and irregular plurals are an important grammatical milestone at this age." },
+    { category: '🌟 Sensory', tip: "Try star gazing or cloud watching tonight — lie back and just look and breathe. This kind of receptive sensory experience is deeply calming and great for bonding." },
+    { category: '💛 Connection', tip: "Make a Declan's favorites book together — favorite food, color, animal, song. Creating a personal book builds identity, language, and something to share with others." },
+    { category: '🧩 ABA', tip: "Practice unexpected changes today in a low-stakes way — serve dinner on a different plate, take a new route. Gentle exposure to the unexpected builds flexibility over time." },
+    { category: '🗣️ Speech', tip: "Work on comparative language today — bigger, faster, louder. Comparatives are an important language milestone and a natural part of everyday observation." },
+    { category: '🎵 Music', tip: "Try a simple music and movement warm-up today — stretch to slow music, shake to fast music. Linking movement to music tempo builds body regulation and rhythm." },
+    { category: '🌟 Sensory', tip: "Create a calm box with Declan today — fill it with things that help him regulate: a stress ball, a fidget, something soft, something scented. Having tools builds independence." },
+    { category: '💛 Connection', tip: "Write a letter to future Declan together today — 'You are 4 years old and you love...' Reading it years from now will be magical for both of you." },
+    { category: '🧩 ABA', tip: "Work on sharing today with a preferred item — starting with something he is less attached to. Sharing is a complex social skill that benefits from explicit, supported practice." },
+    { category: '🗣️ Speech', tip: "Practice spatial language today — on, under, behind, next to, between. Spatial prepositions are important for both academic and functional communication." },
+    { category: '🌟 Sensory', tip: "Try making a soft sensory nest with blankets and pillows today. A cozy, enclosed space provides proprioceptive input and can be deeply calming for children with ASD." },
+    { category: '💛 Connection', tip: "Ask Declan three questions about his day tonight — something he liked, something that was hard, and something that made him laugh. This builds reflection and emotional expression." },
+    { category: '🧩 ABA', tip: "Practice a safety routine today in a calm, playful way. Knowing what to do in unexpected situations gives children with ASD a script for unpredictable events." },
+    { category: '🎵 Music', tip: "Try to find the beat together in a favorite song today — clap along, tap feet, nod heads. Beat awareness is a musical milestone and a great bilateral coordination activity." },
+    { category: '🗣️ Speech', tip: "Work on question words today through a question game — who, what, where, when, why. Understanding question words is essential for conversation and academic language." },
+    { category: '🌟 Sensory', tip: "Try a simple stretching routine together today. Stretching builds body awareness, proprioception, and is calming for the nervous system before bedtime." },
+    { category: '💛 Connection', tip: "Give Declan a specific responsibility today — feeding a pet, watering a plant, setting a placemat. Responsibility builds competence, pride, and belonging in the family." },
+    { category: '🧩 ABA', tip: "Work on initiating play today — practice asking 'Can I play?' or 'Do you want to play with me?' Having a reliable script reduces the anxiety of social initiation." },
+    { category: '🗣️ Speech', tip: "Practice function words today — 'What do you do with a spoon? What do you do with a coat?' Understanding function is a key vocabulary skill at this age." },
+    { category: '🌟 Sensory', tip: "Try a texture walk through your house today — soft carpet, smooth tile, bumpy walls. Guided tactile exploration builds vocabulary and sensory tolerance." },
+    { category: '💛 Connection', tip: "Do something creative together today with no rules or goals — just paint, draw, or build freely. Open-ended creative play nourishes the imagination and communicates trust." },
+    { category: '🧩 ABA', tip: "Practice eye contact in a natural, rewarding way today — look at Declan and light up when he meets your gaze. Natural reinforcement is far more effective than prompting." },
+    { category: '🎵 Music', tip: "Try a musical emotions exercise — play a piece and say 'this music feels happy' or 'this feels calm.' Mapping emotions onto music deepens both musical and emotional intelligence." },
+    { category: '🗣️ Speech', tip: "Practice narratives with a wordless picture book today — make up a story together from the pictures. Wordless books invite rich language without the pressure of reading." },
+    { category: '🌟 Sensory', tip: "Try standing on one foot together today — a balance challenge. Single-leg balance builds vestibular processing and body coordination." },
+    { category: '💛 Connection', tip: "Plan something together for tomorrow — even something small like what to have for breakfast. Future planning builds language, anticipation, and a sense of agency." },
+    { category: '🧩 ABA', tip: "Work on recognizing when a friend is happy or upset today. Look for natural opportunities to name what you observe in others — 'She looks sad, I wonder why.'" },
+    { category: '🎵 Music', tip: "Try body percussion today — clap, stomp, snap, pat knees. Making music with your own body is accessible anywhere and builds rhythm and body awareness." },
+    { category: '🗣️ Speech', tip: "Practice 'because' today — 'I am hungry because I did not eat lunch.' Using 'because' is a major milestone in causal reasoning and language complexity." },
+    { category: '🌟 Sensory', tip: "Try a weighted blanket or heavy stuffed animal during storytime tonight. Gentle weight during calm activities can be deeply organizing for the nervous system." },
+    { category: '💛 Connection', tip: "Find something to wonder about together today — a bug, a cloud, how things work. Wondering together builds curiosity, language, and a shared sense of discovery." },
+    { category: '🧩 ABA', tip: "Work on apologies today in a simple, scripted way — 'I am sorry I took that. Are you okay?' Giving Declan the words makes apologizing feel manageable rather than overwhelming." },
+    { category: '🎵 Music', tip: "Try a song about a daily routine today — there are wonderful ones for morning, mealtime, and bath. Routine songs make transitions feel like celebration rather than obligation." },
+    { category: '🗣️ Speech', tip: "Practice 'and then' storytelling today — you say a sentence, Declan adds one with 'and then.' This back-and-forth narrative building is wonderful for language and connection." },
+    { category: '🌟 Sensory', tip: "Try a sensory bottle filled with water and oil today — watching them separate and mix is calming and visually engaging, perfect for transitions or wind-down time." },
+    { category: '💛 Connection', tip: "Do a random act of kindness together today — leave a note for a neighbor, pick up litter, draw something for a friend. Kindness as a shared practice shapes character." },
+    { category: '🧩 ABA', tip: "Practice answering 'what would you do if...' questions today in a fun way. Problem-solving scenarios build executive function and social thinking in a low-pressure format." },
+    { category: '🎵 Music', tip: "Try listening with eyes closed today — put on a piece of music and just listen without any other input. Pure auditory focus builds listening skills and calm." },
+    { category: '🗣️ Speech', tip: "Work on asking 'who' questions today — 'Who is that? Who lives there? Who said that?' Wh-question comprehension is a significant milestone at this age." },
+    { category: '🌟 Sensory', tip: "Try a 'texture art' project today — press different objects into paint and stamp them. Exploring texture through art is creative and builds sensory flexibility." },
+    { category: '💛 Connection', tip: "Make a list together of things Declan is really good at. Revisit it whenever he needs a confidence boost. Knowing your strengths is a lifelong protective factor." },
+    { category: '🧩 ABA', tip: "Work on the concept of 'private' today — some things we keep to ourselves, some things are for the family, some are for everyone. Social boundaries start with this understanding." },
+    { category: '🗣️ Speech', tip: "Practice rhyming today — cat, hat, bat, mat. Rhyme awareness is a phonological skill that supports literacy development and is naturally playful." },
+    { category: '🌟 Sensory', tip: "Try a 'listening walk' today — go outside and identify every sound you hear. Auditory focus during nature walks builds attention and sensory awareness simultaneously." },
+  ],
+  '5plus': [
+    { category: '🗣️ Speech', tip: "Practice having a short conversation today with a clear beginning and end. Topic introduction, a few exchanges, and topic close is a social script worth building at this age." },
+    { category: '🧩 ABA', tip: "Work on problem-solving language today — when something goes wrong, ask 'what could we do?' rather than solving it for him. Building self-advocacy starts here." },
+    { category: '🎵 Music', tip: "Try writing a simple song together today about something Declan loves. Creative expression through music builds confidence, language, and emotional literacy." },
+    { category: '💛 Connection', tip: "Talk about Declan's feelings at the end of today — something that felt good, something that felt hard, something he is looking forward to. This builds emotional vocabulary." },
+    { category: '🗣️ Speech', tip: "Practice narrative language today by asking Declan to tell you about his day in order. 'What happened first? Then what? How did it end?' are powerful prompts." },
+    { category: '🧩 ABA', tip: "Work on perspective-taking with a simple scenario today — 'How do you think that made them feel?' Building theory of mind is a key focus at this developmental stage." },
+    { category: '🌟 Sensory', tip: "Build a self-regulation toolkit with Declan today — a list of things that help him calm down. Having his own named strategies builds independence and self-awareness." },
+    { category: '🗣️ Speech', tip: "Practice using conjunctions today — because, but, so, and. These connecting words are the building blocks of complex language and reasoning." },
+    { category: '💛 Connection', tip: "Talk openly about what makes Declan unique and wonderful today. Children who understand and take pride in their neurodiversity show better long-term wellbeing." },
+    { category: '🧩 ABA', tip: "Practice entering a group activity today — 'Can I play too?' Role-playing this at home builds the confidence to try it in real settings." },
+    { category: '🎵 Music', tip: "Listen to a piece of music together today and talk about how it makes you feel. Emotional responses to music are a rich entry point into emotional literacy." },
+    { category: '🌟 Sensory', tip: "Work with Declan on identifying when his body needs a break. 'How does your body feel right now — green, yellow, or red?' Building this awareness is a lifelong skill." },
+    { category: '🗣️ Speech', tip: "Practice asking clarifying questions today — 'What do you mean?' or 'Can you say more about that?' These are powerful conversation tools to build explicitly." },
+    { category: '💛 Connection', tip: "Create a worry box together today — a place where Declan can put written or drawn worries. Externalizing worries helps children process anxiety in a healthy way." },
+    { category: '🧩 ABA', tip: "Practice giving and receiving compliments today. A natural, comfortable response to praise — 'Thank you!' — is a social skill worth working on explicitly." },
+    { category: '🎵 Music', tip: "Try learning a short piece of music by heart together — even just a few bars on a toy piano or xylophone. The memory and focus required is enormously beneficial." },
+    { category: '🌟 Sensory', tip: "Practice mindfulness together today — sit quietly for 2 minutes and notice 5 things you can see, 4 you can touch, 3 you can hear. This builds self-regulation and focus." },
+    { category: '🗣️ Speech', tip: "Practice maintenance in conversation today — responding to what the other person said before introducing a new topic. This skill makes conversations feel natural and reciprocal." },
+    { category: '💛 Connection', tip: "Read a book together that has a character facing a challenge and talk about how the character felt and what they did. Social stories in literature build empathy." },
+    { category: '🧩 ABA', tip: "Work on flexibility in rules today — play a game where you change one rule halfway through, and practice 'that is okay, we can adjust.' Flexible thinking is a core life skill." },
+    { category: '🗣️ Speech', tip: "Practice making inferences today — look at a picture or scene and ask 'what do you think is happening? Why?' Inferencing is a major language milestone at this age." },
+    { category: '🌟 Sensory', tip: "Try a progressive muscle relaxation exercise with Declan today — tense and release each muscle group. This is a powerful tool for body awareness and stress management." },
+    { category: '💛 Connection', tip: "Celebrate one of Declan's strengths explicitly today — name it, frame it, and help him see it as a superpower. Strength-based identity is protective and empowering." },
+    { category: '🧩 ABA', tip: "Practice initiating social interaction today — teach a few opening lines like 'Do you want to play?' or 'I like your...' Having reliable openers reduces the anxiety of starting." },
+    { category: '🎵 Music', tip: "Explore the connection between music and emotion today — play a sad song, then a happy one, and name what you notice in your body. This deepens emotional awareness." },
+    { category: '🗣️ Speech', tip: "Work on expanding sentence length today — encourage Declan to say more by asking 'tell me more about that.' Length and complexity of utterances grow with gentle scaffolding." },
+    { category: '🧩 ABA', tip: "Practice 'I do not know' today — it is okay to not know the answer and to say so. Teaching this response reduces anxiety around questions and builds authentic communication." },
+    { category: '🎵 Music', tip: "Try composing a simple song today — even just two lines. Original composition builds creative confidence and gives Declan a unique way to express himself." },
+    { category: '💛 Connection', tip: "Have a silly day today — wear something funny, make up words, laugh at nothing. Shared silliness is connecting and also helps with flexible, playful thinking." },
+    { category: '🌟 Sensory', tip: "Try an art project with different textures today — collage with cotton, sandpaper, foil. Tactile art builds sensory tolerance in a creative, low-pressure context." },
+    { category: '🗣️ Speech', tip: "Practice interruption etiquette today — 'Excuse me' before entering a conversation. Social language rules like this are best taught explicitly and practiced often." },
+    { category: '🧩 ABA', tip: "Work on sportsmanship today — practice winning gracefully and losing gracefully in a low-stakes game. These are genuinely complex social skills that need patient practice." },
+    { category: '🎵 Music', tip: "Try listening to the same song in two different arrangements today — classical then jazz. Musical flexibility broadens the ear and models that there is more than one way to do things." },
+    { category: '💛 Connection', tip: "Talk about a mistake you made today — model how you felt, what you did, and what you learned. Seeing parents handle mistakes with grace is one of the most powerful lessons." },
+    { category: '🌟 Sensory', tip: "Try a sensory scavenger hunt today — find something soft, something cold, something rough, something smooth. Guided sensory exploration builds vocabulary and sensory confidence." },
+    { category: '🗣️ Speech', tip: "Practice giving directions today — 'First go left, then turn right...' Giving clear directions builds sequencing, spatial language, and confidence as a communicator." },
+    { category: '🧩 ABA', tip: "Work on identifying when someone is sad or upset and what might help them. Building a repertoire of empathetic responses is a key social skill at this stage." },
+    { category: '🎵 Music', tip: "Try singing in a round today — Row Your Boat works well. Singing in rounds builds listening, timing, and the ability to maintain your own voice amid others." },
+    { category: '💛 Connection', tip: "Make a brag board together today — things Declan is proud of, things he is good at. Regular acknowledgment of competence builds a strong, positive self-concept." },
+    { category: '🌟 Sensory', tip: "Try mindful walking today — walk very slowly and notice every step, every sound, every smell. Slowing down builds presence and sensory awareness." },
+    { category: '🗣️ Speech', tip: "Practice paraphrasing today — after someone tells you something, say 'So what you are saying is...' This powerful communication skill builds both listening and language." },
+    { category: '🧩 ABA', tip: "Work on reading social cues today — look at someone's face and body language and guess how they are feeling without them saying anything. This is the foundation of social intelligence." },
+    { category: '🎵 Music', tip: "Try music journaling today — play a piece and draw or paint what it makes you see or feel. These exercises build creative and emotional expression." },
+    { category: '💛 Connection', tip: "Ask Declan for his opinion today — about what to have for dinner, which book to read, where to go. Seeking his input regularly builds voice, agency, and self-worth." },
+    { category: '🌟 Sensory', tip: "Try a grounding exercise today — press feet firmly into the floor, feel the chair beneath you, take three slow breaths. Grounding is an essential self-regulation skill." },
+    { category: '🗣️ Speech', tip: "Work on telephone conversation today — practice calling and answering a pretend phone. Phone conversations lack visual cues and need specific practice for children with ASD." },
+    { category: '🧩 ABA', tip: "Practice apologizing sincerely today — 'I am sorry I did that, it was not kind.' Understanding the components of a genuine apology is an important social and emotional skill." },
+    { category: '🎵 Music', tip: "Explore music history through one fun fact today — who invented the piano? What country does samba come from? Musical knowledge connects to culture, history, and curiosity." },
+    { category: '💛 Connection', tip: "Do something kind for someone else together today. Contributing to others builds empathy, community belonging, and a sense of purpose." },
+    { category: '🌟 Sensory', tip: "Try gardening or digging in soil today. Contact with earth is deeply grounding and sensory-rich, and growing something teaches patience and cause-and-effect." },
+    { category: '🗣️ Speech', tip: "Practice using filler phrases today — 'um, let me think about that' or 'that is a good question.' These stall phrases reduce anxiety and give Declan time to process." },
+    { category: '🧩 ABA', tip: "Work on personal space awareness today — how close is too close? A concrete, practiced understanding of personal space prevents many social misunderstandings." },
+    { category: '🎵 Music', tip: "Try conducting music together today — wave your arms to a piece of music and change the tempo. Conducting builds musical awareness and the feeling of control over sound." },
+    { category: '💛 Connection', tip: "Create a family tradition together today — something small and repeatable that is yours. Traditions create identity, belonging, and beautiful memories." },
+    { category: '🌟 Sensory', tip: "Try a hot/cold contrast today — warm hands in hot water, then cool water. Temperature contrast is a mild sensory challenge that builds tolerance and body awareness." },
+    { category: '🗣️ Speech', tip: "Work on abstract language today — metaphors, idioms, figures of speech. 'It is raining cats and dogs' — what does that really mean? Abstract language understanding grows significantly at this stage." },
+    { category: '🧩 ABA', tip: "Practice self-advocacy today — 'I need a break' or 'that is too loud for me.' Learning to name and communicate needs is one of the most important lifelong skills." },
+    { category: '🎵 Music', tip: "Try beatboxing or vocal percussion together today. This playful music-making builds breath control, rhythm, and is genuinely hilarious and connecting." },
+    { category: '💛 Connection', tip: "Write Declan a letter today telling him who he is and how much he has grown. Tuck it away to give him someday. These time capsule letters become treasures." },
+    { category: '🌟 Sensory', tip: "Try a sensory journal today — draw or write about three things you noticed with your senses. Building sensory awareness is a form of mindfulness that supports regulation." },
+    { category: '🗣️ Speech', tip: "Work on expressing disagreement respectfully today — 'I see it differently' or 'I do not agree because...' Disagreeing without conflict is a vital social-emotional skill." },
+    { category: '🧩 ABA', tip: "Practice conversation repair today — what do you do when there is a misunderstanding? 'I think I was not clear, let me try again.' Repair skills make communication resilient." },
+    { category: '🎵 Music', tip: "Try improvising together on instruments today — no rules, just sound. Musical improvisation builds spontaneity, listening, and comfort with the unexpected." },
+    { category: '💛 Connection', tip: "Talk about someone who inspires you today. Sharing role models and values with children helps them build a moral compass and sense of aspiration." },
+    { category: '🌟 Sensory', tip: "Try a slow mindful walk in nature today focused purely on sensory experience. Time in nature reduces cortisol and supports emotional regulation." },
+    { category: '🗣️ Speech', tip: "Work on storytelling today with a beginning, problem, and resolution. Story grammar is a key academic language skill that also supports social narrative understanding." },
+    { category: '🧩 ABA', tip: "Practice giving feedback today — 'I liked when you... and maybe next time...' Constructive feedback is a social skill that builds emotional intelligence on both sides." },
+    { category: '🎵 Music', tip: "Try learning a few notes of a real song on an instrument today. Even one short melody builds musical confidence and the satisfaction of mastery." },
+    { category: '💛 Connection', tip: "Ask Declan what he wants to be when he grows up and explore it together. Dreams are worth nurturing carefully at every age." },
+    { category: '🌟 Sensory', tip: "Try a body map activity today — outline Declan's body on paper and name all the parts. Body mapping builds body awareness, vocabulary, and a positive relationship with his physical self." },
+    { category: '🗣️ Speech', tip: "Practice academic language today — compare, explain, describe, predict. These Tier 2 words appear across all school subjects and are worth building explicitly." },
+    { category: '🧩 ABA', tip: "Work on recognizing when to ask for help versus trying independently. 'Have I tried my best?' is the key question. Teaching this judgment builds real executive function." },
+    { category: '🎵 Music', tip: "Try a music quiz today — can you name that tune? Musical memory games build auditory processing, memory, and the joy of shared knowledge." },
+    { category: '💛 Connection', tip: "Make a bucket list of things you want to do together this year. Planning adventures together builds anticipation, language, and the beautiful expectation of joy." },
+    { category: '🗣️ Speech', tip: "Work on persuasive language today — 'I think we should... because...' Making a case for what you want is an important language and thinking skill." },
+    { category: '🧩 ABA', tip: "Practice recognizing humor today — jokes, silly misunderstandings, funny situations. Social humor is genuinely complex and benefits from gentle, explicit exploration." },
+    { category: '🌟 Sensory', tip: "Try yoga together today — even just three simple poses. Yoga builds body awareness, breath control, balance, and calm in an accessible, joyful way." },
+    { category: '💛 Connection', tip: "Look at old videos or photos of Declan as a baby and toddler together. Talking about the past builds autobiographical memory and a strong sense of personal narrative." },
+    { category: '🎵 Music', tip: "Explore a new music genre together today — reggae, bluegrass, flamenco. Musical curiosity broadens the mind and models openness to new experiences." },
+    { category: '🗣️ Speech', tip: "Practice hedging language today — 'maybe,' 'I think,' 'I am not sure.' Being comfortable with uncertainty in language is a mark of sophisticated communication." },
+    { category: '🧩 ABA', tip: "Work on setting a small goal today and making a plan to achieve it. Goal-setting is an executive function skill that will serve Declan across his entire life." },
+    { category: '🌟 Sensory', tip: "Try aromatherapy today — lavender, peppermint, or lemon. Different scents have different regulatory effects and giving Declan language for scent preferences builds self-knowledge." },
+    { category: '💛 Connection', tip: "Have a yes day today — say yes to every reasonable request. Occasional days of saying yes builds trust, joy, and the memory of being truly celebrated." },
+    { category: '🗣️ Speech', tip: "Work on narrative perspective today — tell a story from two different characters' points of view. This builds theory of mind and language flexibility simultaneously." },
+    { category: '🧩 ABA', tip: "Practice being a good friend today — what does a good friend do? Make, keep, and repair friendships are three distinct skill sets worth exploring at this age." },
+    { category: '🎵 Music', tip: "Try composing a 'feelings playlist' together — songs for happy days, songs for calm, songs for energy. Having musical tools for each emotional state is powerful self-regulation." },
+    { category: '💛 Connection', tip: "Talk about something you are working on getting better at today. Modeling a growth mindset — 'I am still learning' — is one of the most important gifts you can give." },
+    { category: '🌟 Sensory', tip: "Try a 'sensory diet' today — plan specific sensory input at regular intervals throughout the day. A proactive sensory plan prevents dysregulation rather than just responding to it." },
+    { category: '🗣️ Speech', tip: "Work on formal versus informal language today — how we talk to friends versus teachers. Register awareness is a sophisticated social language skill that grows significantly at this age." },
+    { category: '🧩 ABA', tip: "Practice managing disappointment today with a small planned letdown — 'the park is closed today' — and a plan for what to do instead. Building disappointment tolerance is essential." },
+    { category: '🎵 Music', tip: "Try movement improvisation to music today — no steps, no rules, just let your body respond to the sound. Free movement builds body confidence and emotional expression." },
+    { category: '💛 Connection', tip: "Create a 'family values' list together today — three things your family believes in. Shared values give children identity, moral grounding, and a sense of belonging." },
+    { category: '🌟 Sensory', tip: "Try thermal regulation today — a warm drink on a cool day, a cool cloth on a warm day. Learning to use temperature for self-regulation is a practical sensory tool." },
+    { category: '🗣️ Speech', tip: "Practice active listening today — face the speaker, nod, make sounds of acknowledgment. These listener behaviors are explicit social skills that can be taught and practiced." },
+    { category: '🧩 ABA', tip: "Work on reading facial expressions in photos today — not just happy and sad, but surprise, disgust, fear, and contempt. Nuanced emotion recognition supports social understanding." },
+    { category: '🎵 Music', tip: "Try call and response rap or beatboxing today. This form of musical communication builds rhythm, memory, and the joyful exchange of sound." },
+    { category: '💛 Connection', tip: "Tell Declan the story of the day he was born today. Children love origin stories, and knowing this story builds identity, belonging, and a deep sense of being wanted." },
+  ]
+};
+
+
+function getTipAgeGroup(years, months) {
+  const total = (years * 12) + months;
+  if (total < 48) return '3to4';
+  if (total < 60) return '4to5';
+  return '5plus';
+}
+
+function loadDailyTip(forceNew = false) {
+  const tipContent = document.getElementById('dailyTipContent');
+  const tipDate = document.getElementById('dailyTipDate');
+  if (!tipContent) return;
+
+  const today = new Date().toDateString();
+
+  // Get Declan's current age
+  const savedData = loadState();
+  const ageYears = savedData && savedData.ageYears ? parseInt(savedData.ageYears) : 3;
+  const ageMonths = savedData && savedData.ageMonths ? parseInt(savedData.ageMonths) : 4;
+  const ageGroup = getTipAgeGroup(ageYears, ageMonths);
+  const tips = TIPS_BY_AGE[ageGroup];
+
+  // Use cached tip if same day, same age group, and not forcing new
+  if (!forceNew) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(TIP_STORAGE_KEY) || '{}');
+      if (cached.date === today && cached.tip && cached.ageGroup === ageGroup) {
+        tipContent.innerHTML = `<div style="font-size:0.78rem;font-weight:700;color:var(--terracotta);margin-bottom:0.4rem;">${cached.category}</div>${cached.tip}`;
+        if (tipDate) tipDate.textContent = 'Tip for ' + new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }) + ` · Age ${ageYears}y ${ageMonths}m`;
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Pick tip — rotate by day of year so it changes daily and cycles through all tips
+  let index;
+  if (forceNew) {
+    const cached = JSON.parse(localStorage.getItem(TIP_STORAGE_KEY) || '{}');
+    do { index = Math.floor(Math.random() * tips.length); }
+    while (tips.length > 1 && cached.tip && tips[index].tip === cached.tip);
+  } else {
+    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    index = dayOfYear % tips.length;
+  }
+
+  const tip = tips[index];
+  tipContent.innerHTML = `<div style="font-size:0.78rem;font-weight:700;color:var(--terracotta);margin-bottom:0.4rem;">${tip.category}</div>${tip.tip}`;
+  if (tipDate) tipDate.textContent = 'Tip for ' + new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }) + ` · Age ${ageYears}y ${ageMonths}m`;
+  localStorage.setItem(TIP_STORAGE_KEY, JSON.stringify({ date: today, tip: tip.tip, category: tip.category, ageGroup }));
+}
+
+// ── INIT ──
+(function initApp() {
+  // Load from localStorage immediately so UI isn't blank
+  const saved = loadState();
+  if (saved) applyLoadedState(saved);
+  renderJournalEntries();
+  updateDashboard();
+  // Firebase will load and overwrite with latest cloud data via window 'load' event
+})();
+
+// ── FIREBASE AUTH FUNCTIONS ──
+// (defined here so they have access to all app functions like buildSaveObject, applyLoadedState, etc.)
+
+function unlockApp() {
+  const email = document.getElementById('lockEmail').value.trim();
+  const password = document.getElementById('lockInput').value;
+  const error = document.getElementById('lockError');
+  const btn = document.getElementById('unlockBtn');
+  if (!email || !password) { error.textContent = 'Please enter your email and password.'; return; }
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+  window.auth.signInWithEmailAndPassword(email, password)
+    .then(() => {})
+    .catch((err) => {
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      if (['auth/wrong-password','auth/user-not-found','auth/invalid-credential'].includes(err.code)) {
+        error.textContent = 'Incorrect email or password.';
+      } else if (err.code === 'auth/invalid-email') {
+        error.textContent = 'Please enter a valid email address.';
+      } else if (err.code === 'auth/too-many-requests') {
+        error.textContent = 'Too many attempts. Please try again later.';
+      } else {
+        error.textContent = 'Sign in failed. Please try again.';
+      }
+      document.getElementById('lockInput').value = '';
+    });
+}
+
+function lockApp() {
+  window.auth.signOut().then(() => {
+    document.getElementById('lockScreen').style.display = 'flex';
+    document.getElementById('lockScreen').classList.remove('hidden');
+    document.getElementById('appContent').classList.add('blurred');
+    document.getElementById('lockEmail').value = '';
+    document.getElementById('lockInput').value = '';
+    document.getElementById('lockError').textContent = '';
+    document.getElementById('unlockBtn').textContent = 'Sign In';
+    document.getElementById('unlockBtn').disabled = false;
+  });
+}
+
+function showChangePassword() {
+  document.getElementById('changePwModal').style.display = 'flex';
+  document.getElementById('newPw1').value = '';
+  document.getElementById('newPw2').value = '';
+  document.getElementById('changePwError').textContent = '';
+}
+
+function closeChangePassword() {
+  document.getElementById('changePwModal').style.display = 'none';
+}
+
+function saveNewPassword() {
+  const p1 = document.getElementById('newPw1').value;
+  const p2 = document.getElementById('newPw2').value;
+  const err = document.getElementById('changePwError');
+  if (!p1 || p1.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
+  if (p1 !== p2) { err.textContent = 'Passwords do not match.'; return; }
+  window.auth.currentUser.updatePassword(p1)
+    .then(() => { closeChangePassword(); showToast('Password updated!'); })
+    .catch(() => { err.textContent = 'Failed to update. Please sign out and back in first.'; });
+}
+
+function toggleLockVisibility() {
+  const input = document.getElementById('lockInput');
+  const btn = document.getElementById('lockToggleBtn');
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁️'; }
+}
+
+// ── FIREBASE SYNC FUNCTIONS ──
+// (defined here so buildSaveObject and applyLoadedState are guaranteed available)
+
+function showSyncStatus(msg, color) {
+  const el = document.getElementById('syncStatus');
+  if (el) { el.textContent = msg; el.style.color = color; }
+}
+
+function saveToFirebase() {
+  if (!window.auth.currentUser) { console.warn('saveToFirebase: no user logged in'); return; }
+  try {
+    showSyncStatus('Saving...', 'var(--tan)');
+    const toSave = buildSaveObject();
+    const json = JSON.stringify(toSave);
+    window.DOC_REF.set({ data: json })
+      .then(() => {
+        try { localStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+        showSyncStatus('✓ Saved', 'var(--sage)');
+        setTimeout(() => showSyncStatus('', ''), 2500);
+      })
+      .catch((err) => {
+        console.error('Firebase save error:', err);
+        showSyncStatus('⚠ Offline — saved locally', 'var(--terracotta)');
+      });
+  } catch(e) {
+    console.error('saveToFirebase exception:', e);
+    showSyncStatus('⚠ Offline — saved locally', 'var(--terracotta)');
+  }
+}
+
+function loadFromFirebase() {
+  showSyncStatus('Loading...', 'var(--tan)');
+  window.DOC_REF.get()
+    .then((snap) => {
+      if (snap.exists) {
+        try {
+          applyLoadedState(JSON.parse(snap.data().data));
+          showSyncStatus('✓ Loaded', 'var(--sage)');
+          setTimeout(() => showSyncStatus('', ''), 2000);
+        } catch(e) {
+          console.error('Error parsing Firebase data:', e);
+          showSyncStatus('', '');
+        }
+      } else {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) { try { applyLoadedState(JSON.parse(raw)); } catch(e) {} }
+        showSyncStatus('', '');
+      }
+    })
+    .catch((err) => {
+      console.error('Firebase load error:', err);
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) { try { applyLoadedState(JSON.parse(raw)); } catch(e) {} }
+      showSyncStatus('⚠ Offline mode', 'var(--terracotta)');
+    });
+}
+
+// ── AUTH STATE LISTENER ──
+window.auth.onAuthStateChanged((user) => {
+  if (user) {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('appContent').classList.remove('blurred');
+    const emailEl = document.getElementById('loggedInEmail');
+    if (emailEl) emailEl.textContent = user.email;
+    loadFromFirebase();
+    loadDailyTip(false);
+  } else {
+    document.getElementById('lockScreen').style.display = 'flex';
+    document.getElementById('lockScreen').classList.remove('hidden');
+    document.getElementById('appContent').classList.add('blurred');
+  }
+});
+
+// ── EXPOSE ALL FUNCTIONS TO WINDOW ──
+window.unlockApp = unlockApp;
+window.lockApp = lockApp;
+window.toggleLockVisibility = toggleLockVisibility;
+window.showChangePassword = showChangePassword;
+window.closeChangePassword = closeChangePassword;
+window.saveNewPassword = saveNewPassword;
+window.showPage = showPage;
+window.showToast = showToast;
+window.toggleMilestone = toggleMilestone;
+window.addCustomMilestone = addCustomMilestone;
+window.removeCustomMilestone = removeCustomMilestone;
+window.updateAgeAndMilestones = updateAgeAndMilestones;
+window.triggerDocUpload = triggerDocUpload;
+window.handleDocUpload = handleDocUpload;
+window.handleAvatarUpload = handleAvatarUpload;
+window.downloadDoc = downloadDoc;
+window.deleteDoc = deleteDoc;
+window.openFolderModal = openFolderModal;
+window.closeFolderModal = closeFolderModal;
+window.renderFolderModal = renderFolderModal;
+window.deleteFolderDoc = deleteFolderDoc;
+window.selectMood = selectMood;
+window.handleJournalPhotos = handleJournalPhotos;
+window.saveJournalEntry = saveJournalEntry;
+window.selectWeek = selectWeek;
+window.selectHCat = selectHCat;
+window.addHighlight = addHighlight;
+window.deleteHighlight = deleteHighlight;
+window.renderMonthView = renderMonthView;
+window.selectSourceType = selectSourceType;
+window.selectStar = selectStar;
+window.selectResearchFilter = selectResearchFilter;
+window.saveResearch = saveResearch;
+window.deleteResearch = deleteResearch;
+window.renderTherapyGoals = renderTherapyGoals;
+window.addTherapyGoal = addTherapyGoal;
+window.toggleTherapyGoal = toggleTherapyGoal;
+window.deleteTherapyGoal = deleteTherapyGoal;
+window.loadDailyTip = loadDailyTip;
+
+</script>
+
+</div><!-- end appContent -->
+</body>
+</html>
