@@ -3076,19 +3076,35 @@ function unlockApp() {
   if (!email || !password) { error.textContent = 'Please enter your email and password.'; return; }
   btn.textContent = 'Signing in...';
   btn.disabled = true;
+  error.textContent = '';
+
+  // Check Firebase auth is available
+  if (!window.auth) {
+    error.textContent = 'Connection error — please refresh the page and try again.';
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+    return;
+  }
+
   window.auth.signInWithEmailAndPassword(email, password)
-    .then(() => {})
+    .then((result) => {
+      // Success — onAuthStateChanged will handle showing the app
+      console.log('Sign in successful:', result.user.email);
+    })
     .catch((err) => {
+      console.error('Sign in error:', err.code, err.message);
       btn.textContent = 'Sign In';
       btn.disabled = false;
-      if (['auth/wrong-password','auth/user-not-found','auth/invalid-credential'].includes(err.code)) {
-        error.textContent = 'Incorrect email or password.';
+      if (['auth/wrong-password','auth/user-not-found','auth/invalid-credential','auth/invalid-login-credentials'].includes(err.code)) {
+        error.textContent = 'Incorrect email or password. Please try again.';
       } else if (err.code === 'auth/invalid-email') {
         error.textContent = 'Please enter a valid email address.';
       } else if (err.code === 'auth/too-many-requests') {
-        error.textContent = 'Too many attempts. Please try again later.';
+        error.textContent = 'Too many attempts. Please wait a few minutes and try again.';
+      } else if (err.code === 'auth/network-request-failed') {
+        error.textContent = 'Network error — please check your internet connection.';
       } else {
-        error.textContent = 'Sign in failed. Please try again.';
+        error.textContent = 'Error: ' + (err.code || err.message) + ' — please try again.';
       }
       document.getElementById('lockInput').value = '';
     });
