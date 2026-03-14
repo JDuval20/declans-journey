@@ -2338,27 +2338,26 @@ function updateDashboard() {
     if (tier) tierLabel.textContent = tier.label;
   }
   // Stat counts
-  document.getElementById('statEntries').textContent = state.journals.length;
-  const totalDocs = Object.values(state.docs).reduce((a, b) => a + b.length, 0);
+  document.getElementById('statEntries').textContent = state.journals ? state.journals.length : 0;
+  const totalDocs = state.docs ? Object.values(state.docs).reduce((a, b) => a + b.length, 0) : 0;
   document.getElementById('statDocs').textContent = totalDocs;
-  const totalGoals = Object.values(state.therapyGoals).flat().filter(g => g.done).length;
+  const totalGoals = state.therapyGoals ? Object.values(state.therapyGoals).flat().filter(g => g.done).length : 0;
   document.getElementById('statMilestones').textContent = totalGoals;
 
   // Update therapy goals mini bars
-  const tgCats = { aba:'terracotta', speech:'dusty-blue', music:'purple', parents:'sage' };
   ['aba','speech','music','parents'].forEach(cat => {
-    const goals = state.therapyGoals[cat] || [];
+    const goals = (state.therapyGoals && state.therapyGoals[cat]) ? state.therapyGoals[cat] : [];
     const pct = goals.length > 0 ? Math.round((goals.filter(g => g.done).length / goals.length) * 100) : 0;
     const el = document.getElementById('pct-' + cat);
     const bar = document.getElementById('bar-' + cat);
     if (el) el.textContent = pct + '%';
     if (bar) bar.style.width = pct + '%';
   });
-  document.getElementById('statMilestones').textContent = totalMilestones;
 
   // Recent journal entries
   const container = document.getElementById('dashboardEntries');
-  if (state.journals.length === 0) {
+  if (!container) return;
+  if (!state.journals || state.journals.length === 0) {
     container.innerHTML = '<div class="doc-empty">No entries yet — start your first journal entry!</div>';
   } else {
     container.innerHTML = state.journals.slice(0, 3).map(entry => `
