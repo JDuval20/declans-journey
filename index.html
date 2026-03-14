@@ -1503,6 +1503,9 @@
 <div class="toast" id="toast"></div>
 
 
+
+</div><!-- end appContent -->
+
 <!-- Firebase SDK (compat version - no module scope issues) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -3193,20 +3196,24 @@ function loadFromFirebase() {
 // ── AUTH STATE LISTENER ──
 window.auth.onAuthStateChanged((user) => {
   if (user) {
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('appContent').classList.remove('blurred');
+    const ls = document.getElementById('lockScreen');
+    const ac = document.getElementById('appContent');
+    if (ls) ls.style.display = 'none';
+    if (ac) ac.classList.remove('blurred');
     const emailEl = document.getElementById('loggedInEmail');
     if (emailEl) emailEl.textContent = user.email;
     loadFromFirebase();
     loadDailyTip(false);
   } else {
-    document.getElementById('lockScreen').style.display = 'flex';
-    document.getElementById('lockScreen').classList.remove('hidden');
-    document.getElementById('appContent').classList.add('blurred');
+    const ls = document.getElementById('lockScreen');
+    const ac = document.getElementById('appContent');
+    if (ls) { ls.style.display = 'flex'; ls.classList.remove('hidden'); }
+    if (ac) ac.classList.add('blurred');
   }
 });
 
 // ── EXPOSE ALL FUNCTIONS TO WINDOW ──
+// Must happen before any onclick handlers fire
 window.unlockApp = unlockApp;
 window.lockApp = lockApp;
 window.toggleLockVisibility = toggleLockVisibility;
@@ -3249,6 +3256,6 @@ window.loadDailyTip = loadDailyTip;
 
 </script>
 
-</div><!-- end appContent -->
+
 </body>
 </html>
