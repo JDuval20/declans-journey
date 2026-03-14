@@ -1496,6 +1496,60 @@
   </div>
 </div>
 
+<!-- EDIT JOURNAL MODAL -->
+<div id="editJournalModal" style="display:none;position:fixed;inset:0;background:rgba(61,44,30,0.45);z-index:9000;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--warm-white);border-radius:24px;padding:2rem;width:100%;max-width:520px;box-shadow:0 16px 48px rgba(61,44,30,0.18);border:1.5px solid rgba(232,213,183,0.7);">
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--text-dark);margin-bottom:1.25rem;">✏️ Edit Journal Entry</div>
+    <input type="hidden" id="editJournalIndex">
+    <div style="margin-bottom:1rem;">
+      <label class="form-label">Mood</label>
+      <div class="mood-selector">
+        <button class="mood-btn edit-mood-btn" data-mood="great" onclick="selectEditMood(this)">🌟 Great</button>
+        <button class="mood-btn edit-mood-btn" data-mood="good" onclick="selectEditMood(this)">😊 Good</button>
+        <button class="mood-btn edit-mood-btn" data-mood="okay" onclick="selectEditMood(this)">😐 Okay</button>
+        <button class="mood-btn edit-mood-btn" data-mood="hard" onclick="selectEditMood(this)">😔 Hard</button>
+        <button class="mood-btn edit-mood-btn" data-mood="tough" onclick="selectEditMood(this)">😢 Tough</button>
+      </div>
+    </div>
+    <div style="margin-bottom:1.25rem;">
+      <label class="form-label">Entry</label>
+      <textarea id="editJournalText" style="width:100%;border:1.5px solid var(--sand);border-radius:12px;padding:0.75rem 1rem;font-family:'Nunito',sans-serif;font-size:0.9rem;color:var(--text-dark);background:var(--cream);outline:none;resize:vertical;min-height:120px;"></textarea>
+    </div>
+    <div style="display:flex;gap:0.75rem;">
+      <button onclick="saveEditedJournal()" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,var(--terracotta),var(--rust));color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;">Save Changes</button>
+      <button onclick="document.getElementById('editJournalModal').style.display='none'" style="padding:0.75rem 1.25rem;background:var(--cream);border:1.5px solid var(--sand);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:600;color:var(--text-light);cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT HIGHLIGHT MODAL -->
+<div id="editHighlightModal" style="display:none;position:fixed;inset:0;background:rgba(61,44,30,0.45);z-index:9000;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--warm-white);border-radius:24px;padding:2rem;width:100%;max-width:520px;box-shadow:0 16px 48px rgba(61,44,30,0.18);border:1.5px solid rgba(232,213,183,0.7);">
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--text-dark);margin-bottom:1.25rem;">✏️ Edit Highlight</div>
+    <input type="hidden" id="editHighlightKey">
+    <input type="hidden" id="editHighlightWeek">
+    <input type="hidden" id="editHighlightId">
+    <div style="margin-bottom:1rem;">
+      <label class="form-label">Category</label>
+      <div class="highlight-category-select">
+        <button class="hcat-btn edit-hcat-btn" data-cat="general" onclick="selectEditHCat(this)">General</button>
+        <button class="hcat-btn edit-hcat-btn" data-cat="speech" onclick="selectEditHCat(this)">Speech</button>
+        <button class="hcat-btn edit-hcat-btn" data-cat="social" onclick="selectEditHCat(this)">Social</button>
+        <button class="hcat-btn edit-hcat-btn" data-cat="motor" onclick="selectEditHCat(this)">Motor</button>
+        <button class="hcat-btn edit-hcat-btn" data-cat="daily" onclick="selectEditHCat(this)">Daily Living</button>
+      </div>
+    </div>
+    <div style="margin-bottom:1.25rem;">
+      <label class="form-label">Moment</label>
+      <textarea id="editHighlightText" style="width:100%;border:1.5px solid var(--sand);border-radius:12px;padding:0.75rem 1rem;font-family:'Nunito',sans-serif;font-size:0.9rem;color:var(--text-dark);background:var(--cream);outline:none;resize:vertical;min-height:100px;"></textarea>
+    </div>
+    <div style="display:flex;gap:0.75rem;">
+      <button onclick="saveEditedHighlight()" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,var(--terracotta),var(--rust));color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;">Save Changes</button>
+      <button onclick="document.getElementById('editHighlightModal').style.display='none'" style="padding:0.75rem 1.25rem;background:var(--cream);border:1.5px solid var(--sand);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:600;color:var(--text-light);cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -2287,7 +2341,10 @@ function renderJournalEntries() {
   }
   list.innerHTML = state.journals.map((entry, index) => `
     <div class="journal-entry-card" style="position:relative;">
-      <button onclick="deleteJournalEntry(${index})" title="Delete entry" style="position:absolute;top:0.6rem;right:0.6rem;background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.8rem;opacity:0.5;transition:opacity 0.15s;padding:0.2rem;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">✕</button>
+      <div style="position:absolute;top:0.6rem;right:0.6rem;display:flex;gap:0.3rem;">
+        <button onclick="editJournalEntry(${index})" title="Edit entry" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.8rem;opacity:0.5;transition:opacity 0.15s;padding:0.2rem;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">✏️</button>
+        <button onclick="deleteJournalEntry(${index})" title="Delete entry" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.8rem;opacity:0.5;transition:opacity 0.15s;padding:0.2rem;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">✕</button>
+      </div>
       <div class="entry-header">
         <span class="entry-mood-badge badge-${entry.mood}">${moodLabels[entry.mood]}</span>
         <span class="entry-date-text">${entry.date || entry.dateShort}</span>
@@ -2296,6 +2353,38 @@ function renderJournalEntries() {
       ${entry.photos && entry.photos.length > 0 ? `<div class="entry-photos">${entry.photos.map(src => `<div class="entry-photo-thumb"><img src="${src}" alt="photo"></div>`).join('')}</div>` : ''}
     </div>
   `).join('');
+}
+
+function editJournalEntry(index) {
+  const entry = state.journals[index];
+  if (!entry) return;
+  document.getElementById('editJournalIndex').value = index;
+  document.getElementById('editJournalText').value = entry.text || '';
+  // Set mood buttons
+  document.querySelectorAll('.edit-mood-btn').forEach(b => b.className = 'mood-btn edit-mood-btn');
+  const moodBtn = document.querySelector(`.edit-mood-btn[data-mood="${entry.mood}"]`);
+  if (moodBtn) moodBtn.classList.add('selected-' + entry.mood);
+  document.getElementById('editJournalModal').style.display = 'flex';
+}
+
+function saveEditedJournal() {
+  const index = parseInt(document.getElementById('editJournalIndex').value);
+  const text = document.getElementById('editJournalText').value.trim();
+  const activeMood = document.querySelector('.edit-mood-btn.selected-great, .edit-mood-btn.selected-good, .edit-mood-btn.selected-okay, .edit-mood-btn.selected-hard, .edit-mood-btn.selected-tough');
+  if (state.journals[index]) {
+    state.journals[index].text = text;
+    if (activeMood) state.journals[index].mood = activeMood.dataset.mood;
+  }
+  document.getElementById('editJournalModal').style.display = 'none';
+  renderJournalEntries();
+  updateDashboard();
+  saveState();
+  showToast('Entry updated!');
+}
+
+function selectEditMood(btn) {
+  document.querySelectorAll('.edit-mood-btn').forEach(b => b.className = 'mood-btn edit-mood-btn');
+  btn.classList.add('selected-' + btn.dataset.mood);
 }
 
 function deleteJournalEntry(index) {
@@ -2419,6 +2508,43 @@ function deleteHighlight(hlKey, weekKey, id) {
   saveState();
 }
 
+function editHighlight(hlKey, weekKey, id) {
+  const entry = (state.highlights[hlKey][weekKey] || []).find(h => h.id === id);
+  if (!entry) return;
+  document.getElementById('editHighlightKey').value = hlKey;
+  document.getElementById('editHighlightWeek').value = weekKey;
+  document.getElementById('editHighlightId').value = id;
+  document.getElementById('editHighlightText').value = entry.text;
+  // Set category
+  document.querySelectorAll('.edit-hcat-btn').forEach(b => b.classList.remove('hcat-active'));
+  const catBtn = document.querySelector(`.edit-hcat-btn[data-cat="${entry.cat}"]`);
+  if (catBtn) catBtn.classList.add('hcat-active');
+  document.getElementById('editHighlightModal').style.display = 'flex';
+}
+
+function saveEditedHighlight() {
+  const hlKey = document.getElementById('editHighlightKey').value;
+  const weekKey = document.getElementById('editHighlightWeek').value;
+  const id = parseInt(document.getElementById('editHighlightId').value);
+  const text = document.getElementById('editHighlightText').value.trim();
+  const activeCat = document.querySelector('.edit-hcat-btn.hcat-active');
+  if (!text) { showToast('Please enter some text.'); return; }
+  const entry = (state.highlights[hlKey][weekKey] || []).find(h => h.id === id);
+  if (entry) {
+    entry.text = text;
+    if (activeCat) entry.cat = activeCat.dataset.cat;
+  }
+  document.getElementById('editHighlightModal').style.display = 'none';
+  renderMonthView();
+  saveState();
+  showToast('Highlight updated!');
+}
+
+function selectEditHCat(btn) {
+  document.querySelectorAll('.edit-hcat-btn').forEach(b => b.classList.remove('hcat-active'));
+  btn.classList.add('hcat-active');
+}
+
 function renderMonthView() {
   const month = parseInt(document.getElementById('hlMonth').value);
   const year = parseInt(document.getElementById('hlYear').value);
@@ -2444,6 +2570,7 @@ function renderMonthView() {
           <div class="highlight-bullet cat-${h.cat}"></div>
           <div class="highlight-text">${h.text}</div>
           <span class="highlight-cat-tag ${catTagClass[h.cat]}">${catLabels[h.cat]}</span>
+          <button class="delete-highlight" onclick="editHighlight('${key}','${wk}',${h.id})" title="Edit" style="opacity:0;color:var(--dusty-blue);font-size:0.8rem;">✏️</button>
           <button class="delete-highlight" onclick="deleteHighlight('${key}','${wk}',${h.id})" title="Remove">✕</button>
         </div>
       `).join('')}
@@ -3198,6 +3325,13 @@ window.addTherapyGoal = addTherapyGoal;
 window.toggleTherapyGoal = toggleTherapyGoal;
 window.deleteTherapyGoal = deleteTherapyGoal;
 window.loadDailyTip = loadDailyTip;
+window.editJournalEntry = editJournalEntry;
+window.saveEditedJournal = saveEditedJournal;
+window.selectEditMood = selectEditMood;
+window.deleteJournalEntry = deleteJournalEntry;
+window.editHighlight = editHighlight;
+window.saveEditedHighlight = saveEditedHighlight;
+window.selectEditHCat = selectEditHCat;
 
 // ── CHECK SESSION ON LOAD ──
 try {
