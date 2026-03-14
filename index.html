@@ -1260,6 +1260,19 @@
         </div>
       </div>
 
+      <div class="card" id="dashHighlightsCard">
+        <div class="card-title" style="justify-content:space-between;">
+          <span>✨ This Month's Highlights</span>
+          <span id="dashHighlightsMonth" style="font-size:0.78rem;font-weight:600;color:var(--text-light);font-family:'Nunito',sans-serif;"></span>
+        </div>
+        <div id="dashHighlightsContent" style="margin-top:0.5rem;">
+          <div style="color:var(--text-light);font-style:italic;font-size:0.85rem;">No highlights yet this month.</div>
+        </div>
+        <div style="margin-top:0.75rem;">
+          <button onclick="document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-highlights').classList.add('active');document.querySelectorAll('.nav-tab')[5].classList.add('active');initHighlightsPage();" style="background:none;border:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;color:var(--terracotta);cursor:pointer;padding:0;text-decoration:underline;">View all highlights →</button>
+        </div>
+      </div>
+
       <div class="card" id="dailyTipCard">
         <div class="card-title" style="justify-content:space-between;">
           <span>💡 Daily Tip for Declan</span>
@@ -1546,6 +1559,52 @@
     <div style="display:flex;gap:0.75rem;">
       <button onclick="saveEditedHighlight()" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,var(--terracotta),var(--rust));color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;">Save Changes</button>
       <button onclick="document.getElementById('editHighlightModal').style.display='none'" style="padding:0.75rem 1.25rem;background:var(--cream);border:1.5px solid var(--sand);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:600;color:var(--text-light);cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- JOURNAL EDIT MODAL -->
+<div id="editJournalModal" style="display:none;position:fixed;inset:0;background:rgba(61,44,30,0.45);z-index:9500;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--warm-white);border-radius:24px;padding:2rem;width:100%;max-width:560px;box-shadow:0 16px 48px rgba(61,44,30,0.18);border:1.5px solid rgba(232,213,183,0.7);">
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--text-dark);margin-bottom:1.25rem;">✏️ Edit Journal Entry</div>
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.5rem;">Mood</div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <button class="mood-btn edit-mood-btn" data-mood="great" onclick="selectEditMood(this)">🌟 Great</button>
+      <button class="mood-btn edit-mood-btn" data-mood="good" onclick="selectEditMood(this)">😊 Good</button>
+      <button class="mood-btn edit-mood-btn" data-mood="okay" onclick="selectEditMood(this)">😐 Okay</button>
+      <button class="mood-btn edit-mood-btn" data-mood="hard" onclick="selectEditMood(this)">😔 Hard</button>
+      <button class="mood-btn edit-mood-btn" data-mood="tough" onclick="selectEditMood(this)">😢 Tough</button>
+    </div>
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.5rem;">Entry</div>
+    <textarea id="editJournalText" style="width:100%;border:1.5px solid var(--sand);border-radius:12px;padding:0.85rem 1rem;font-family:'Nunito',sans-serif;font-size:0.9rem;color:var(--text-dark);background:var(--cream);outline:none;resize:vertical;min-height:130px;margin-bottom:1.25rem;"></textarea>
+    <input type="hidden" id="editJournalIndex">
+    <div style="display:flex;gap:0.75rem;">
+      <button onclick="saveEditedJournal()" style="flex:1;padding:0.85rem;background:linear-gradient(135deg,var(--terracotta),var(--rust));color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">Save Changes</button>
+      <button onclick="document.getElementById('editJournalModal').style.display='none'" style="padding:0.85rem 1.25rem;background:var(--cream);border:1.5px solid var(--sand);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;color:var(--text-mid);">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIGHLIGHT EDIT MODAL -->
+<div id="editHighlightModal" style="display:none;position:fixed;inset:0;background:rgba(61,44,30,0.45);z-index:9500;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--warm-white);border-radius:24px;padding:2rem;width:100%;max-width:500px;box-shadow:0 16px 48px rgba(61,44,30,0.18);border:1.5px solid rgba(232,213,183,0.7);">
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--text-dark);margin-bottom:1.25rem;">✏️ Edit Highlight</div>
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.5rem;">Category</div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <button class="hcat-btn edit-hcat-btn" data-cat="general" onclick="selectEditHCat(this)">General</button>
+      <button class="hcat-btn edit-hcat-btn" data-cat="speech" onclick="selectEditHCat(this)">Speech</button>
+      <button class="hcat-btn edit-hcat-btn" data-cat="social" onclick="selectEditHCat(this)">Social</button>
+      <button class="hcat-btn edit-hcat-btn" data-cat="motor" onclick="selectEditHCat(this)">Motor</button>
+      <button class="hcat-btn edit-hcat-btn" data-cat="daily" onclick="selectEditHCat(this)">Daily Living</button>
+    </div>
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.5rem;">Highlight</div>
+    <textarea id="editHighlightText" style="width:100%;border:1.5px solid var(--sand);border-radius:12px;padding:0.85rem 1rem;font-family:'Nunito',sans-serif;font-size:0.9rem;color:var(--text-dark);background:var(--cream);outline:none;resize:vertical;min-height:100px;margin-bottom:1.25rem;"></textarea>
+    <input type="hidden" id="editHighlightKey">
+    <input type="hidden" id="editHighlightWeek">
+    <input type="hidden" id="editHighlightId">
+    <div style="display:flex;gap:0.75rem;">
+      <button onclick="saveEditedHighlight()" style="flex:1;padding:0.85rem;background:linear-gradient(135deg,var(--terracotta),var(--rust));color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">Save Changes</button>
+      <button onclick="document.getElementById('editHighlightModal').style.display='none'" style="padding:0.85rem 1.25rem;background:var(--cream);border:1.5px solid var(--sand);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;color:var(--text-mid);">Cancel</button>
     </div>
   </div>
 </div>
@@ -2459,11 +2518,62 @@ function updateDashboard() {
     `).join('');
   }
   updateMiniStats();
+  renderDashboardHighlights();
 }
 
 // ── MONTHLY HIGHLIGHTS ──
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const catTagClass = { general:'htag-general', speech:'htag-speech', social:'htag-social', motor:'htag-motor', daily:'htag-daily' };
+
+function renderDashboardHighlights() {
+  const container = document.getElementById('dashHighlightsContent');
+  const monthLabel = document.getElementById('dashHighlightsMonth');
+  if (!container) return;
+
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  const key = `${year}-${month}`;
+  const monthName = monthNames[month] + ' ' + year;
+
+  if (monthLabel) monthLabel.textContent = monthName;
+
+  const data = state.highlights && state.highlights[key];
+  if (!data) {
+    container.innerHTML = '<div style="color:var(--text-light);font-style:italic;font-size:0.85rem;">No highlights yet this month.</div>';
+    return;
+  }
+
+  // Collect all entries across all weeks
+  const allEntries = [];
+  ['w1','w2','w3','w4'].forEach((wk, i) => {
+    (data[wk] || []).forEach(h => {
+      allEntries.push({ ...h, week: 'Week ' + (i + 1) });
+    });
+  });
+
+  if (allEntries.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-light);font-style:italic;font-size:0.85rem;">No highlights yet this month.</div>';
+    return;
+  }
+
+  // Show up to 5 most recent entries
+  const shown = allEntries.slice(-5).reverse();
+  container.innerHTML = shown.map(h => `
+    <div style="display:flex;align-items:flex-start;gap:0.6rem;padding:0.5rem 0;border-bottom:1px solid var(--sand);">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--terracotta);flex-shrink:0;margin-top:5px;"></div>
+      <div style="flex:1;">
+        <div style="font-size:0.85rem;color:var(--text-mid);line-height:1.4;">${h.text}</div>
+        <div style="font-size:0.72rem;color:var(--text-light);margin-top:2px;">${h.week} · <span style="background:var(--sand);padding:0.1rem 0.4rem;border-radius:8px;">${catLabels[h.cat] || h.cat}</span></div>
+      </div>
+    </div>
+  `).join('');
+
+  // Show count if more than 5
+  if (allEntries.length > 5) {
+    container.innerHTML += `<div style="font-size:0.78rem;color:var(--text-light);margin-top:0.5rem;text-align:center;">+ ${allEntries.length - 5} more this month</div>`;
+  }
+}
 const catLabels = { general:'General', speech:'Speech', social:'Social', motor:'Motor', daily:'Daily Living' };
 
 function initHighlightsPage() {
@@ -3321,6 +3431,12 @@ window.selectResearchFilter = selectResearchFilter;
 window.saveResearch = saveResearch;
 window.deleteResearch = deleteResearch;
 window.renderTherapyGoals = renderTherapyGoals;
+window.editJournalEntry = editJournalEntry;
+window.saveEditedJournal = saveEditedJournal;
+window.selectEditMood = selectEditMood;
+window.editHighlight = editHighlight;
+window.saveEditedHighlight = saveEditedHighlight;
+window.selectEditHCat = selectEditHCat;
 window.addTherapyGoal = addTherapyGoal;
 window.toggleTherapyGoal = toggleTherapyGoal;
 window.deleteTherapyGoal = deleteTherapyGoal;
