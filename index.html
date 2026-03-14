@@ -1178,16 +1178,13 @@
   <div class="lock-card">
     <span class="lock-icon">🍀</span>
     <div class="lock-title">Declan's Journey</div>
-    <div class="lock-subtitle">This site is private. Please sign in to continue.</div>
-    <div class="lock-input-wrap" style="margin-bottom:0.75rem;">
-      <input class="lock-input" type="email" id="lockEmail" placeholder="Email address" onkeydown="if(event.key==='Enter') document.getElementById('lockInput').focus()" style="letter-spacing:normal;">
-    </div>
+    <div class="lock-subtitle">This site is private. Enter your password to continue.</div>
     <div class="lock-input-wrap">
-      <input class="lock-input" type="password" id="lockInput" placeholder="Password" onkeydown="if(event.key==='Enter') unlockApp()">
+      <input class="lock-input" type="password" id="lockInput" placeholder="Password" onkeydown="if(event.key==='Enter')document.getElementById('unlockBtn').click()">
       <button class="lock-toggle" onclick="toggleLockVisibility()" id="lockToggleBtn" title="Show/hide password">👁️</button>
     </div>
     <div class="lock-error" id="lockError"></div>
-    <button class="lock-btn" id="unlockBtn" onclick="unlockApp()">Sign In</button>
+    <button class="lock-btn" id="unlockBtn" onclick="doUnlock()">Unlock</button>
     <div class="lock-hint" id="lockHint"></div>
   </div>
 </div>
@@ -1509,7 +1506,6 @@
 <!-- Firebase SDK (compat version - no module scope issues) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
 // ── FIREBASE CONFIG ──
 const firebaseConfig = {
@@ -1525,7 +1521,6 @@ firebase.initializeApp(firebaseConfig);
 
 // Assign to window so they are accessible from any script block
 window.db = firebase.firestore();
-window.auth = firebase.auth();
 window.DOC_REF = window.db.collection('declansjourney').doc('maindata');
 </script>
 
@@ -1557,7 +1552,7 @@ const state = {
 };
 
 // ── STORAGE HELPERS ──
-const STORAGE_KEY = 'dj_appstate';
+var STORAGE_KEY = 'dj_appstate';
 
 function buildSaveObject() {
   return {
@@ -2027,19 +2022,6 @@ function addCustomMilestone(cat) {
   renderMilestones();
   saveState();
   showToast('Custom goal added!');
-}
-
-function hideTierMilestone(cat, id) {
-  if (!state.deletedMilestones[cat]) state.deletedMilestones[cat] = [];
-  state.deletedMilestones[cat].push(id);
-  // Also clear any saved completion state for it
-  if (state.milestones[cat] && state.milestones[cat][id]) {
-    delete state.milestones[cat][id];
-  }
-  renderMilestones();
-  updateDashboard();
-  saveState();
-  showToast('Goal removed. You can restore it anytime.');
 }
 
 function restoreAllMilestones(cat) {
@@ -2692,7 +2674,7 @@ function deleteTherapyGoal(cat, id) {
 }
 
 // ── DAILY TIP ──
-const TIP_STORAGE_KEY = 'dj_dailytip';
+var TIP_STORAGE_KEY = 'dj_dailytip';
 
 const TIPS_BY_AGE = {
   '3to4': [
@@ -3065,62 +3047,51 @@ function loadDailyTip(forceNew = false) {
   // Firebase will load and overwrite with latest cloud data via window 'load' event
 })();
 
-// ── FIREBASE AUTH FUNCTIONS ──
-// (defined here so they have access to all app functions like buildSaveObject, applyLoadedState, etc.)
+// ── PASSWORD PROTECTION ──
+var DJ_DEFAULT_PW = 'Declan2024!';
+var DJ_PW_KEY = 'dj_pw_v2';
+var DJ_SESSION = 'dj_session_v2';
+
+function getPassword() {
+  return localStorage.getItem(DJ_PW_KEY) || DJ_DEFAULT_PW;
+}
 
 function unlockApp() {
-  const email = document.getElementById('lockEmail').value.trim();
-  const password = document.getElementById('lockInput').value;
+  const input = document.getElementById('lockInput');
   const error = document.getElementById('lockError');
-  const btn = document.getElementById('unlockBtn');
-  if (!email || !password) { error.textContent = 'Please enter your email and password.'; return; }
-  btn.textContent = 'Signing in...';
-  btn.disabled = true;
-  error.textContent = '';
-
-  // Check Firebase auth is available
-  if (!window.auth) {
-    error.textContent = 'Connection error — please refresh the page and try again.';
-    btn.textContent = 'Sign In';
-    btn.disabled = false;
-    return;
+  const val = input.value;
+  if (!val) { error.textContent = 'Please enter your password.'; return; }
+  if (val === getPassword()) {
+    sessionStorage.setItem(DJ_SESSION, '1');
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('appContent').classList.remove('blurred');
+    error.textContent = '';
+    input.value = '';
+    loadFromFirebase();
+    loadDailyTip(false);
+  } else {
+    error.textContent = 'Incorrect password. Please try again.';
+    input.classList.add('error');
+    setTimeout(() => input.classList.remove('error'), 400);
+    input.value = '';
+    input.focus();
   }
-
-  window.auth.signInWithEmailAndPassword(email, password)
-    .then((result) => {
-      // Success — onAuthStateChanged will handle showing the app
-      console.log('Sign in successful:', result.user.email);
-    })
-    .catch((err) => {
-      console.error('Sign in error:', err.code, err.message);
-      btn.textContent = 'Sign In';
-      btn.disabled = false;
-      if (['auth/wrong-password','auth/user-not-found','auth/invalid-credential','auth/invalid-login-credentials'].includes(err.code)) {
-        error.textContent = 'Incorrect email or password. Please try again.';
-      } else if (err.code === 'auth/invalid-email') {
-        error.textContent = 'Please enter a valid email address.';
-      } else if (err.code === 'auth/too-many-requests') {
-        error.textContent = 'Too many attempts. Please wait a few minutes and try again.';
-      } else if (err.code === 'auth/network-request-failed') {
-        error.textContent = 'Network error — please check your internet connection.';
-      } else {
-        error.textContent = 'Error: ' + (err.code || err.message) + ' — please try again.';
-      }
-      document.getElementById('lockInput').value = '';
-    });
 }
 
 function lockApp() {
-  window.auth.signOut().then(() => {
-    document.getElementById('lockScreen').style.display = 'flex';
-    document.getElementById('lockScreen').classList.remove('hidden');
-    document.getElementById('appContent').classList.add('blurred');
-    document.getElementById('lockEmail').value = '';
-    document.getElementById('lockInput').value = '';
-    document.getElementById('lockError').textContent = '';
-    document.getElementById('unlockBtn').textContent = 'Sign In';
-    document.getElementById('unlockBtn').disabled = false;
-  });
+  sessionStorage.removeItem(DJ_SESSION);
+  document.getElementById('lockScreen').style.display = 'flex';
+  document.getElementById('lockScreen').classList.remove('hidden');
+  document.getElementById('appContent').classList.add('blurred');
+  document.getElementById('lockInput').value = '';
+  document.getElementById('lockInput').focus();
+}
+
+function toggleLockVisibility() {
+  const input = document.getElementById('lockInput');
+  const btn = document.getElementById('lockToggleBtn');
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁️'; }
 }
 
 function showChangePassword() {
@@ -3140,44 +3111,29 @@ function saveNewPassword() {
   const err = document.getElementById('changePwError');
   if (!p1 || p1.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
   if (p1 !== p2) { err.textContent = 'Passwords do not match.'; return; }
-  window.auth.currentUser.updatePassword(p1)
-    .then(() => { closeChangePassword(); showToast('Password updated!'); })
-    .catch(() => { err.textContent = 'Failed to update. Please sign out and back in first.'; });
+  localStorage.setItem(DJ_PW_KEY, p1);
+  closeChangePassword();
+  showToast('Password updated!');
 }
 
-function toggleLockVisibility() {
-  const input = document.getElementById('lockInput');
-  const btn = document.getElementById('lockToggleBtn');
-  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
-  else { input.type = 'password'; btn.textContent = '👁️'; }
-}
-
-// ── FIREBASE SYNC FUNCTIONS ──
-// (defined here so buildSaveObject and applyLoadedState are guaranteed available)
-
+// ── FIREBASE SYNC ──
 function showSyncStatus(msg, color) {
   const el = document.getElementById('syncStatus');
   if (el) { el.textContent = msg; el.style.color = color; }
 }
 
 function saveToFirebase() {
-  if (!window.auth.currentUser) { console.warn('saveToFirebase: no user logged in'); return; }
   try {
     showSyncStatus('Saving...', 'var(--tan)');
-    const toSave = buildSaveObject();
-    const json = JSON.stringify(toSave);
+    const json = JSON.stringify(buildSaveObject());
     window.DOC_REF.set({ data: json })
       .then(() => {
         try { localStorage.setItem(STORAGE_KEY, json); } catch(e) {}
         showSyncStatus('✓ Saved', 'var(--sage)');
         setTimeout(() => showSyncStatus('', ''), 2500);
       })
-      .catch((err) => {
-        console.error('Firebase save error:', err);
-        showSyncStatus('⚠ Offline — saved locally', 'var(--terracotta)');
-      });
+      .catch(() => { showSyncStatus('⚠ Offline — saved locally', 'var(--terracotta)'); });
   } catch(e) {
-    console.error('saveToFirebase exception:', e);
     showSyncStatus('⚠ Offline — saved locally', 'var(--terracotta)');
   }
 }
@@ -3187,49 +3143,23 @@ function loadFromFirebase() {
   window.DOC_REF.get()
     .then((snap) => {
       if (snap.exists) {
-        try {
-          applyLoadedState(JSON.parse(snap.data().data));
-          showSyncStatus('✓ Loaded', 'var(--sage)');
-          setTimeout(() => showSyncStatus('', ''), 2000);
-        } catch(e) {
-          console.error('Error parsing Firebase data:', e);
-          showSyncStatus('', '');
-        }
+        try { applyLoadedState(JSON.parse(snap.data().data)); } catch(e) {}
+        showSyncStatus('✓ Loaded', 'var(--sage)');
+        setTimeout(() => showSyncStatus('', ''), 2000);
       } else {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) { try { applyLoadedState(JSON.parse(raw)); } catch(e) {} }
         showSyncStatus('', '');
       }
     })
-    .catch((err) => {
-      console.error('Firebase load error:', err);
+    .catch(() => {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) { try { applyLoadedState(JSON.parse(raw)); } catch(e) {} }
       showSyncStatus('⚠ Offline mode', 'var(--terracotta)');
     });
 }
 
-// ── AUTH STATE LISTENER ──
-window.auth.onAuthStateChanged((user) => {
-  if (user) {
-    const ls = document.getElementById('lockScreen');
-    const ac = document.getElementById('appContent');
-    if (ls) ls.style.display = 'none';
-    if (ac) ac.classList.remove('blurred');
-    const emailEl = document.getElementById('loggedInEmail');
-    if (emailEl) emailEl.textContent = user.email;
-    loadFromFirebase();
-    loadDailyTip(false);
-  } else {
-    const ls = document.getElementById('lockScreen');
-    const ac = document.getElementById('appContent');
-    if (ls) { ls.style.display = 'flex'; ls.classList.remove('hidden'); }
-    if (ac) ac.classList.add('blurred');
-  }
-});
-
-// ── EXPOSE ALL FUNCTIONS TO WINDOW ──
-// Must happen before any onclick handlers fire
+// ── EXPOSE ALL FUNCTIONS TO WINDOW — must be first ──
 window.unlockApp = unlockApp;
 window.lockApp = lockApp;
 window.toggleLockVisibility = toggleLockVisibility;
@@ -3270,8 +3200,50 @@ window.toggleTherapyGoal = toggleTherapyGoal;
 window.deleteTherapyGoal = deleteTherapyGoal;
 window.loadDailyTip = loadDailyTip;
 
+// ── CHECK SESSION ON LOAD ──
+try {
+  if (sessionStorage.getItem(DJ_SESSION) === '1') {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('appContent').classList.remove('blurred');
+    loadFromFirebase();
+    loadDailyTip(false);
+  } else {
+    document.getElementById('lockScreen').style.display = 'flex';
+    document.getElementById('appContent').classList.add('blurred');
+    document.getElementById('lockInput').focus();
+    if (!localStorage.getItem(DJ_PW_KEY)) {
+      document.getElementById('lockHint').textContent = 'Default password: Declan2024!';
+    }
+  }
+} catch(e) {
+  console.error('Session check error:', e);
+}
+
 </script>
 
 
+
+<script>
+function doUnlock() {
+  var i = document.getElementById('lockInput');
+  var e = document.getElementById('lockError');
+  var v = i.value;
+  if (!v) { e.textContent = 'Please enter password.'; return; }
+  var pw = localStorage.getItem('dj_pw_v2') || 'Declan2024!';
+  if (v === pw) {
+    sessionStorage.setItem('dj_session_v2', '1');
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('appContent').classList.remove('blurred');
+    e.textContent = '';
+    i.value = '';
+    if (typeof loadFromFirebase === 'function') loadFromFirebase();
+    if (typeof loadDailyTip === 'function') loadDailyTip(false);
+  } else {
+    e.textContent = 'Incorrect password. Please try again.';
+    i.value = '';
+    i.focus();
+  }
+}
+</script>
 </body>
 </html>
