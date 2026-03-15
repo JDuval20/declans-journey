@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Declan's Journey — Development Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #fdf6ee;
@@ -964,6 +964,57 @@
   .research-empty { text-align: center; color: var(--text-light); font-style: italic; padding: 3rem 0; font-size: 0.9rem; grid-column: 1/-1; }
   @media (max-width: 768px) { .research-layout { grid-template-columns: 1fr; } .research-form { position: static; } }
 
+  /* ── PARENTS TO DO ── */
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.5rem;
+    border-radius: 10px;
+    background: var(--cream);
+    border: 1.5px solid var(--sand);
+    transition: background 0.15s;
+    animation: fadeIn 0.2s ease;
+  }
+  .todo-item.done { background: rgba(122,158,126,0.08); border-color: rgba(122,158,126,0.25); }
+  .todo-checkbox {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    border: 2px solid var(--tan);
+    background: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.78rem;
+    transition: all 0.2s;
+  }
+  .todo-checkbox.checked { background: var(--sage); border-color: var(--sage); color: white; }
+  .todo-text { flex: 1; font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; word-break: break-word; }
+  .todo-text.done { text-decoration: line-through; color: var(--text-light); }
+  .todo-edit-input {
+    flex: 1;
+    border: 1.5px solid var(--terracotta);
+    border-radius: 8px;
+    padding: 0.25rem 0.6rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    background: white;
+    outline: none;
+  }
+  .todo-actions { display: flex; gap: 0.3rem; flex-shrink: 0; }
+  .todo-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 0.8rem; color: var(--text-light);
+    padding: 0.15rem 0.3rem; border-radius: 5px;
+    transition: all 0.15s;
+  }
+  .todo-btn:hover { color: var(--terracotta); background: rgba(196,113,74,0.1); }
+  .todo-empty { font-size:0.85rem; color:var(--text-light); font-style:italic; text-align:center; padding:1rem 0; }
+  #todoList::-webkit-scrollbar { width: 4px; }
+  #todoList::-webkit-scrollbar-track { background: var(--sand); border-radius: 10px; }
+  #todoList::-webkit-scrollbar-thumb { background: var(--tan); border-radius: 10px; }
+
   /* ── THERAPY GOALS ── */
   .tgoals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 1.5rem; }
   .tgoal-category {
@@ -1215,7 +1266,7 @@
     <button class="nav-tab active" onclick="showPage('dashboard')">🏠 Dashboard</button>
     <button class="nav-tab" onclick="showPage('therapygoals')">🎯 Goals</button>
     <button class="nav-tab" onclick="showPage('documents')">📂 Documents</button>
-    <button class="nav-tab" onclick="showPage('journal')">📖 Journal</button>
+    <button class="nav-tab" onclick="showPage('challenges')">⚡ Challenges</button>
     <button class="nav-tab" onclick="showPage('highlights')">✨ Highlights</button>
     <button class="nav-tab" onclick="showPage('research')">🔬 Research</button>
   </div>
@@ -1233,8 +1284,8 @@
 <!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
   <div style="text-align:center;margin-bottom:1.75rem;">
-    <h1 style="font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--text-dark);margin-bottom:0.25rem;">Declan's Journey</h1>
-    <p style="font-size:0.95rem;color:var(--text-light);font-style:italic;">Every step forward is worth celebrating 🍀</p>
+    <h1 style="font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--text-dark);margin-bottom:0.3rem;">Declan's Journey</h1>
+    <p style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--terracotta);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:0;text-shadow:1px 1px 0px rgba(168,84,50,0.15);">🍀 Gradatim Ferociter 🍀</p>
   </div>
   <div class="dashboard-grid">
     <div class="profile-card">
@@ -1253,10 +1304,15 @@
     </div>
 
     <div class="dashboard-right">
-      <div class="recent-entries card">
-        <div class="card-title">📖 Recent Journal Entries</div>
-        <div class="entry-list" id="dashboardEntries">
-          <div class="doc-empty">No entries yet — start your first journal entry!</div>
+      <div class="card" id="todoCard">
+        <div class="card-title" style="justify-content:space-between;margin-bottom:1rem;">
+          <span>✅ Parents To Do</span>
+          <span id="todoDoneCount" style="font-size:0.78rem;font-weight:600;color:var(--text-light);font-family:'Nunito',sans-serif;"></span>
+        </div>
+        <div id="todoList" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem;max-height:280px;overflow-y:auto;padding-right:4px;"></div>
+        <div style="display:flex;gap:0.5rem;">
+          <input type="text" id="todoInput" placeholder="Add a new task..." class="research-input" style="margin:0;flex:1;height:38px;padding:0.4rem 0.85rem;font-size:0.85rem;" onkeydown="if(event.key==='Enter')addTodoItem()">
+          <button onclick="addTodoItem()" style="padding:0.4rem 1rem;background:linear-gradient(135deg,var(--terracotta),var(--rust));color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">+ Add</button>
         </div>
       </div>
 
@@ -1305,8 +1361,8 @@
   <div class="docs-grid" id="docsGrid"></div>
 </div>
 
-<!-- JOURNAL -->
-<div id="page-journal" class="page">
+<!-- JOURNAL (hidden - kept for data compatibility) -->
+<div id="page-journal" class="page" style="display:none!important;">
   <div class="section-header">
     <h1>Daily Journal</h1>
     <p>A space to capture the moments, big wins, and quiet observations.</p>
@@ -1314,7 +1370,6 @@
   <div class="journal-layout">
     <div class="journal-form">
       <div class="card-title" style="margin-bottom:1.25rem">✍️ New Entry</div>
-
       <div class="form-group">
         <label class="form-label">How was today?</label>
         <div class="mood-selector">
@@ -1325,12 +1380,10 @@
           <button class="mood-btn" data-mood="tough" onclick="selectMood(this)">😢 Tough</button>
         </div>
       </div>
-
       <div class="form-group">
         <label class="form-label">What did you observe today?</label>
         <textarea id="journalText" placeholder="Write about what you noticed — new words, reactions, moments of connection, behaviors, wins, struggles... everything counts."></textarea>
       </div>
-
       <div class="form-group">
         <label class="form-label">Add Photos</label>
         <div class="photo-drop" onclick="document.getElementById('journalPhotoInput').click()">
@@ -1339,14 +1392,76 @@
         </div>
         <div class="photo-preview" id="journalPhotoPreview"></div>
       </div>
-
       <button class="submit-btn" onclick="saveJournalEntry()">Save Today's Entry</button>
     </div>
-
     <div class="journal-history">
       <div class="card-title" style="margin-bottom:1rem">🗓️ Past Entries</div>
       <div class="journal-entries" id="journalEntriesList">
         <div class="no-entries">Your journal entries will appear here after you save your first one.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHALLENGES -->
+<div id="page-challenges" class="page">
+  <div class="section-header">
+    <h1>Challenges</h1>
+    <p>Track the areas where Declan is currently having difficulties — week by week, month by month.</p>
+  </div>
+  <div class="highlights-layout">
+    <div class="highlights-form">
+      <div class="card-title" style="margin-bottom:1.25rem">⚡ Add a Challenge</div>
+
+      <div class="form-group">
+        <label class="form-label">Month & Year</label>
+        <div class="month-selector">
+          <select id="chMonth" onchange="renderChallengeView()">
+            <option value="0">January</option><option value="1">February</option>
+            <option value="2">March</option><option value="3">April</option>
+            <option value="4">May</option><option value="5">June</option>
+            <option value="6">July</option><option value="7">August</option>
+            <option value="8">September</option><option value="9">October</option>
+            <option value="10">November</option><option value="11">December</option>
+          </select>
+          <input type="number" class="month-year-input" id="chYear" min="2020" max="2040" value="2026" onchange="renderChallengeView()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Week</label>
+        <div class="week-tabs" id="chWeekTabs">
+          <button class="week-tab active" data-week="1" onclick="selectChallengeWeek(this)">Week 1</button>
+          <button class="week-tab" data-week="2" onclick="selectChallengeWeek(this)">Week 2</button>
+          <button class="week-tab" data-week="3" onclick="selectChallengeWeek(this)">Week 3</button>
+          <button class="week-tab" data-week="4" onclick="selectChallengeWeek(this)">Week 4</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <div class="highlight-category-select" id="chCatBtns">
+          <button class="hcat-btn hcat-active" data-cat="general" onclick="selectChallengeCat(this)">General</button>
+          <button class="hcat-btn" data-cat="speech" onclick="selectChallengeCat(this)">Speech</button>
+          <button class="hcat-btn" data-cat="social" onclick="selectChallengeCat(this)">Social</button>
+          <button class="hcat-btn" data-cat="sensory" onclick="selectChallengeCat(this)">Sensory</button>
+          <button class="hcat-btn" data-cat="behavior" onclick="selectChallengeCat(this)">Behavior</button>
+          <button class="hcat-btn" data-cat="daily" onclick="selectChallengeCat(this)">Daily Living</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Challenge / Observation</label>
+        <textarea class="highlight-input" id="chText" placeholder="e.g. Meltdowns during transitions, Refusing certain foods, Difficulty with eye contact, Struggling with sleep routine..."></textarea>
+      </div>
+
+      <button class="add-highlight-btn" onclick="addChallenge()" style="background:linear-gradient(135deg,#c4714a,#a85432);">+ Add Challenge</button>
+    </div>
+
+    <div class="month-view-card">
+      <div class="card-title" style="margin-bottom:1rem" id="challengeViewTitle">This Month's Challenges</div>
+      <div id="chMonthView">
+        <div class="no-highlights">No challenges logged yet for this month.</div>
       </div>
     </div>
   </div>
@@ -1653,6 +1768,10 @@ const state = {
   customMilestones: { speech: [], social: [], motor: [], daily: [] },
   deletedMilestones: { speech: [], social: [], motor: [], daily: [] },
   research: [],
+  challenges: {},
+  chSelectedWeek: 1,
+  chSelectedCat: 'general',
+  todos: [],
   researchSelectedType: null,
   researchSelectedStars: 0,
   researchFilterType: 'all',
@@ -1676,6 +1795,8 @@ function buildSaveObject() {
     customMilestones: state.customMilestones,
     deletedMilestones: state.deletedMilestones,
     research: state.research,
+    challenges: state.challenges,
+    todos: state.todos,
     therapyGoals: state.therapyGoals,
     ageYears: document.getElementById('ageYears') ? document.getElementById('ageYears').value : 3,
     ageMonths: document.getElementById('ageMonths') ? document.getElementById('ageMonths').value : 4,
@@ -1691,6 +1812,8 @@ function applyLoadedState(saved) {
   if (saved.customMilestones) state.customMilestones = saved.customMilestones;
   if (saved.deletedMilestones) state.deletedMilestones = saved.deletedMilestones;
   if (saved.research) state.research = saved.research;
+  if (saved.challenges) state.challenges = saved.challenges;
+  if (saved.todos) state.todos = saved.todos;
   if (saved.therapyGoals) state.therapyGoals = { aba:[], speech:[], music:[], parents:[], ...saved.therapyGoals };
   if (saved.ageYears && document.getElementById('ageYears')) document.getElementById('ageYears').value = saved.ageYears;
   if (saved.ageMonths && document.getElementById('ageMonths')) document.getElementById('ageMonths').value = saved.ageMonths;
@@ -1761,6 +1884,7 @@ function showPage(id) {
   if (id === 'documents') renderDocuments();
   if (id === 'dashboard') updateDashboard();
   if (id === 'highlights') initHighlightsPage();
+  if (id === 'challenges') initChallengePage();
   if (id === 'research') renderResearch();
 }
 
@@ -2502,23 +2626,9 @@ function updateDashboard() {
     if (bar) bar.style.width = pct + '%';
   });
 
-  // Recent journal entries
-  const container = document.getElementById('dashboardEntries');
-  if (!container) return;
-  if (!state.journals || state.journals.length === 0) {
-    container.innerHTML = '<div class="doc-empty">No entries yet — start your first journal entry!</div>';
-  } else {
-    container.innerHTML = state.journals.slice(0, 3).map(entry => `
-      <div class="entry-item mood-${entry.mood}">
-        <div>
-          <div class="entry-text">${entry.text ? entry.text.substring(0, 80) + (entry.text.length > 80 ? '…' : '') : moodLabels[entry.mood]}</div>
-        </div>
-        <div class="entry-meta">${entry.dateShort}<br><span style="font-size:0.8rem">${moodLabels[entry.mood]}</span></div>
-      </div>
-    `).join('');
-  }
   updateMiniStats();
   renderDashboardHighlights();
+  renderTodos();
 }
 
 // ── MONTHLY HIGHLIGHTS ──
@@ -2687,6 +2797,85 @@ function renderMonthView() {
     </div>`;
   });
   container.innerHTML = html || '<div class="no-highlights">No highlights yet for this month.</div>';
+}
+
+// ── CHALLENGES ──
+const chCatLabels = { general:'General', speech:'Speech', social:'Social', sensory:'Sensory', behavior:'Behavior', daily:'Daily Living' };
+const chCatTagClass = { general:'htag-general', speech:'htag-speech', social:'htag-social', sensory:'htag-daily', behavior:'htag-motor', daily:'htag-daily' };
+
+function initChallengePage() {
+  const now = new Date();
+  document.getElementById('chMonth').value = now.getMonth();
+  document.getElementById('chYear').value = now.getFullYear();
+  renderChallengeView();
+}
+
+function selectChallengeWeek(btn) {
+  document.querySelectorAll('#chWeekTabs .week-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.chSelectedWeek = parseInt(btn.dataset.week);
+}
+
+function selectChallengeCat(btn) {
+  document.querySelectorAll('#chCatBtns .hcat-btn').forEach(b => b.classList.remove('hcat-active'));
+  btn.classList.add('hcat-active');
+  state.chSelectedCat = btn.dataset.cat;
+}
+
+function getChKey(month, year) { return `ch_${year}-${month}`; }
+
+function addChallenge() {
+  const text = document.getElementById('chText').value.trim();
+  if (!text) { showToast('Please write a challenge to add.'); return; }
+  const month = parseInt(document.getElementById('chMonth').value);
+  const year = parseInt(document.getElementById('chYear').value);
+  const key = getChKey(month, year);
+  if (!state.challenges[key]) state.challenges[key] = { w1:[], w2:[], w3:[], w4:[] };
+  const weekKey = 'w' + state.chSelectedWeek;
+  state.challenges[key][weekKey].push({ text, cat: state.chSelectedCat, id: Date.now() });
+  document.getElementById('chText').value = '';
+  renderChallengeView();
+  saveState();
+  showToast('Challenge logged.');
+}
+
+function deleteChallenge(chKey, weekKey, id) {
+  state.challenges[chKey][weekKey] = state.challenges[chKey][weekKey].filter(h => h.id !== id);
+  renderChallengeView();
+  saveState();
+}
+
+function renderChallengeView() {
+  const month = parseInt(document.getElementById('chMonth').value);
+  const year = parseInt(document.getElementById('chYear').value);
+  const key = getChKey(month, year);
+  const data = state.challenges[key];
+  const container = document.getElementById('chMonthView');
+  const title = document.getElementById('challengeViewTitle');
+  if (title) title.textContent = `${monthNames[month]} ${year} — Challenges`;
+
+  if (!data || Object.values(data).every(w => w.length === 0)) {
+    container.innerHTML = '<div class="no-highlights">No challenges logged yet for this month.</div>';
+    return;
+  }
+
+  let html = '';
+  ['w1','w2','w3','w4'].forEach((wk, i) => {
+    const entries = (data[wk] || []);
+    if (entries.length === 0) return;
+    html += `<div class="week-section">
+      <div class="week-section-title">Week ${i+1}</div>
+      ${entries.map(h => `
+        <div class="highlight-entry">
+          <div class="highlight-bullet cat-${h.cat}" style="background:var(--mauve)"></div>
+          <div class="highlight-text">${h.text}</div>
+          <span class="highlight-cat-tag ${chCatTagClass[h.cat]}">${chCatLabels[h.cat]}</span>
+          <button class="delete-highlight" onclick="deleteChallenge('${key}','${wk}',${h.id})" title="Remove">✕</button>
+        </div>
+      `).join('')}
+    </div>`;
+  });
+  container.innerHTML = html || '<div class="no-highlights">No challenges logged yet for this month.</div>';
 }
 
 // ── RESEARCH ──
@@ -3273,6 +3462,95 @@ function loadDailyTip(forceNew = false) {
   localStorage.setItem(TIP_STORAGE_KEY, JSON.stringify({ date: today, tip: tip.tip, category: tip.category, ageGroup }));
 }
 
+// ── PARENTS TO DO ──
+function addTodoItem() {
+  const input = document.getElementById('todoInput');
+  const text = input.value.trim();
+  if (!text) { showToast('Please enter a task.'); return; }
+  state.todos.push({ id: Date.now(), text, done: false });
+  input.value = '';
+  renderTodos();
+  saveState();
+}
+
+function toggleTodo(id) {
+  const item = state.todos.find(t => t.id === id);
+  if (!item) return;
+  item.done = !item.done;
+  renderTodos();
+  saveState();
+}
+
+function deleteTodo(id) {
+  state.todos = state.todos.filter(t => t.id !== id);
+  renderTodos();
+  saveState();
+}
+
+function editTodo(id) {
+  const item = state.todos.find(t => t.id === id);
+  if (!item) return;
+  const list = document.getElementById('todoList');
+  const row = list.querySelector(`[data-todo-id="${id}"]`);
+  if (!row) return;
+  // Replace text with input
+  const textEl = row.querySelector('.todo-text');
+  const actionsEl = row.querySelector('.todo-actions');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'todo-edit-input';
+  input.value = item.text;
+  textEl.replaceWith(input);
+  input.focus();
+  actionsEl.innerHTML = `
+    <button class="todo-btn" onclick="saveTodoEdit(${id})" title="Save">✓</button>
+    <button class="todo-btn" onclick="renderTodos()" title="Cancel">✕</button>
+  `;
+}
+
+function saveTodoEdit(id) {
+  const item = state.todos.find(t => t.id === id);
+  if (!item) return;
+  const list = document.getElementById('todoList');
+  const row = list.querySelector(`[data-todo-id="${id}"]`);
+  const input = row ? row.querySelector('.todo-edit-input') : null;
+  if (input && input.value.trim()) {
+    item.text = input.value.trim();
+    renderTodos();
+    saveState();
+  } else {
+    renderTodos();
+  }
+}
+
+function renderTodos() {
+  const list = document.getElementById('todoList');
+  const countEl = document.getElementById('todoDoneCount');
+  if (!list) return;
+
+  const done = state.todos.filter(t => t.done).length;
+  const total = state.todos.length;
+  if (countEl) countEl.textContent = total > 0 ? `${done}/${total} done` : '';
+
+  if (total === 0) {
+    list.innerHTML = '<div class="todo-empty">No tasks yet — add one below!</div>';
+    return;
+  }
+
+  // Show undone first, then done
+  const sorted = [...state.todos.filter(t => !t.done), ...state.todos.filter(t => t.done)];
+  list.innerHTML = sorted.map(t => `
+    <div class="todo-item ${t.done ? 'done' : ''}" data-todo-id="${t.id}">
+      <div class="todo-checkbox ${t.done ? 'checked' : ''}" onclick="toggleTodo(${t.id})">${t.done ? '✓' : ''}</div>
+      <span class="todo-text ${t.done ? 'done' : ''}">${t.text}</span>
+      <div class="todo-actions">
+        ${!t.done ? `<button class="todo-btn" onclick="editTodo(${t.id})" title="Edit">✏️</button>` : ''}
+        <button class="todo-btn" onclick="deleteTodo(${t.id})" title="Delete">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
 // ── INIT ──
 (function initApp() {
   // Load from localStorage immediately so UI isn't blank
@@ -3441,6 +3719,18 @@ window.addTherapyGoal = addTherapyGoal;
 window.toggleTherapyGoal = toggleTherapyGoal;
 window.deleteTherapyGoal = deleteTherapyGoal;
 window.loadDailyTip = loadDailyTip;
+window.initChallengePage = initChallengePage;
+window.selectChallengeWeek = selectChallengeWeek;
+window.selectChallengeCat = selectChallengeCat;
+window.addChallenge = addChallenge;
+window.deleteChallenge = deleteChallenge;
+window.renderChallengeView = renderChallengeView;
+window.addTodoItem = addTodoItem;
+window.toggleTodo = toggleTodo;
+window.deleteTodo = deleteTodo;
+window.editTodo = editTodo;
+window.saveTodoEdit = saveTodoEdit;
+window.renderTodos = renderTodos;
 window.editJournalEntry = editJournalEntry;
 window.saveEditedJournal = saveEditedJournal;
 window.selectEditMood = selectEditMood;
